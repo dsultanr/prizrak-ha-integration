@@ -81,10 +81,10 @@ cards:
     title: Статус автомобиля
     entities:
       - entity: sensor.prizrak_95311_connection
-      - entity: sensor.prizrak_95311_guard_status
-      - entity: sensor.prizrak_95311_alarm_status
+      - entity: sensor.prizrak_95311_guard
+      - entity: sensor.prizrak_95311_alarm
       - entity: sensor.prizrak_95311_battery_voltage
-      - entity: sensor.prizrak_95311_gsm_signal
+      - entity: sensor.prizrak_95311_gsm_level
       - entity: sensor.prizrak_95311_last_update
 
   - type: horizontal-stack
@@ -112,7 +112,7 @@ cards:
     title: Двери и замки
     entities:
       - entity: binary_sensor.prizrak_95311_driver_door
-      - entity: binary_sensor.prizrak_95311_passenger_door
+      - entity: binary_sensor.prizrak_95311_front_pass_door
       - entity: binary_sensor.prizrak_95311_rear_left_door
       - entity: binary_sensor.prizrak_95311_rear_right_door
       - entity: binary_sensor.prizrak_95311_trunk
@@ -123,10 +123,10 @@ cards:
     title: Телеметрия
     entities:
       - entity: sensor.prizrak_95311_speed
-      - entity: sensor.prizrak_95311_engine_rpm
+      - entity: sensor.prizrak_95311_rpm
       - entity: sensor.prizrak_95311_odometer
       - entity: sensor.prizrak_95311_fuel_level
-      - entity: sensor.prizrak_95311_inside_temperature
+      - entity: sensor.prizrak_95311_temperature
       - entity: sensor.prizrak_95311_engine_temperature
 
   - type: map
