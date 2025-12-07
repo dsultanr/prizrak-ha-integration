@@ -43,8 +43,8 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
         # Merge new state with existing
         self.devices[device_id].update(device_state)
 
-        # Add timestamp of last update
-        self.devices[device_id]["last_update"] = dt_util.utcnow().isoformat()
+        # Add timestamp of last update (as datetime object for TIMESTAMP device_class)
+        self.devices[device_id]["last_update"] = dt_util.utcnow()
 
         # Notify all listeners (entities) about the update
         self.async_set_updated_data(self.devices)
