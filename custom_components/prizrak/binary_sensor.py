@@ -75,8 +75,10 @@ class PrizrakBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._sensor_key = sensor_key
         self._state_key = state_key
 
-        self._attr_name = f"{device_name} {name}"
+        # Entity name without device name prefix
+        self._attr_name = name
         self._attr_unique_id = f"prizrak_{device_id}_{sensor_key}"
+        self._attr_has_entity_name = True
         self._attr_device_class = device_class
 
         # Device info for grouping
