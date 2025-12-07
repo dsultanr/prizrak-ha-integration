@@ -47,6 +47,96 @@
 
 Ваши устройства Prizrak появятся автоматически со всеми доступными сенсорами!
 
+## Использование
+
+### Страница устройства
+
+После настройки все сенсоры и кнопки управления автоматически группируются на странице устройства:
+
+1. Перейдите в **Настройки** → **Устройства и службы** → **Prizrak Monitoring**
+2. Нажмите на ваше устройство (например, "Кодиак")
+3. Вы увидите все сенсоры, кнопки и бинарные сенсоры
+
+Home Assistant автоматически предложит добавить устройство в зону **"Garage"**.
+
+### Добавление на Dashboard
+
+Вы можете добавить entities на ваш dashboard несколькими способами:
+
+**Вариант 1: Через GUI (рекомендуется)**
+1. Откройте ваш Dashboard
+2. Нажмите **"Редактировать"** (три точки справа вверху)
+3. Нажмите **"+ Добавить карточку"**
+4. Выберите карточку (например, "Entities" или "Picture Elements")
+5. Добавьте нужные entities из списка
+
+**Вариант 2: YAML конфигурация**
+
+Пример карточки для dashboard:
+
+```yaml
+type: vertical-stack
+cards:
+  - type: entities
+    title: Статус автомобиля
+    entities:
+      - entity: sensor.kodiak_connection
+      - entity: sensor.kodiak_guard_status
+      - entity: sensor.kodiak_alarm_status
+      - entity: sensor.kodiak_battery_voltage
+      - entity: sensor.kodiak_gsm_signal
+
+  - type: horizontal-stack
+    cards:
+      - type: button
+        name: Охрана Вкл
+        entity: button.kodiak_guard_on
+        icon: mdi:shield-check
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.kodiak_guard_on
+      - type: button
+        name: Охрана Выкл
+        entity: button.kodiak_guard_off
+        icon: mdi:shield-off
+        tap_action:
+          action: call-service
+          service: button.press
+          target:
+            entity_id: button.kodiak_guard_off
+
+  - type: entities
+    title: Двери и замки
+    entities:
+      - entity: binary_sensor.kodiak_driver_door
+      - entity: binary_sensor.kodiak_passenger_door
+      - entity: binary_sensor.kodiak_rear_left_door
+      - entity: binary_sensor.kodiak_rear_right_door
+      - entity: binary_sensor.kodiak_trunk
+      - entity: binary_sensor.kodiak_hood
+      - entity: binary_sensor.kodiak_central_lock
+
+  - type: entities
+    title: Телеметрия
+    entities:
+      - entity: sensor.kodiak_speed
+      - entity: sensor.kodiak_engine_rpm
+      - entity: sensor.kodiak_odometer
+      - entity: sensor.kodiak_fuel_level
+      - entity: sensor.kodiak_inside_temperature
+      - entity: sensor.kodiak_engine_temperature
+
+  - type: map
+    entities:
+      - entity: sensor.kodiak_latitude
+    hours_to_show: 24
+    aspect_ratio: "16:9"
+```
+
+**Примечание:** Замените `kodiak` на имя вашего устройства (в нижнем регистре, пробелы заменены на подчеркивания).
+
 ## Сенсоры
 
 ### GPS и местоположение

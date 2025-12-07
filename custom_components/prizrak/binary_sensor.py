@@ -35,6 +35,7 @@ async def async_setup_entry(
                 break
 
         device_name = device_info.get('name', f"Prizrak {device_id}") if device_info else f"Prizrak {device_id}"
+        device_model = device_info.get('model', 'Unknown') if device_info else 'Unknown'
 
         for sensor_key, (name, device_class, state_key) in BINARY_SENSOR_TYPES.items():
             entities.append(
@@ -42,6 +43,7 @@ async def async_setup_entry(
                     coordinator,
                     device_id,
                     device_name,
+                    device_model,
                     sensor_key,
                     name,
                     device_class,
@@ -60,6 +62,7 @@ class PrizrakBinarySensor(CoordinatorEntity, BinarySensorEntity):
         coordinator: PrizrakDataUpdateCoordinator,
         device_id: int,
         device_name: str,
+        device_model: str,
         sensor_key: str,
         name: str,
         device_class: str,
@@ -81,6 +84,8 @@ class PrizrakBinarySensor(CoordinatorEntity, BinarySensorEntity):
             "identifiers": {(DOMAIN, str(device_id))},
             "name": device_name,
             "manufacturer": "Prizrak",
+            "model": device_model,
+            "suggested_area": "Garage",
         }
 
     @property

@@ -35,6 +35,7 @@ async def async_setup_entry(
                 break
 
         device_name = device_info.get('name', f"Prizrak {device_id}") if device_info else f"Prizrak {device_id}"
+        device_model = device_info.get('model', 'Unknown') if device_info else 'Unknown'
 
         for sensor_key, (name, unit, device_class, icon, state_key) in SENSOR_TYPES.items():
             entities.append(
@@ -42,6 +43,7 @@ async def async_setup_entry(
                     coordinator,
                     device_id,
                     device_name,
+                    device_model,
                     sensor_key,
                     name,
                     unit,
@@ -85,6 +87,7 @@ class PrizrakSensor(CoordinatorEntity, SensorEntity):
         coordinator: PrizrakDataUpdateCoordinator,
         device_id: int,
         device_name: str,
+        device_model: str,
         sensor_key: str,
         name: str,
         unit: str | None,
@@ -110,6 +113,8 @@ class PrizrakSensor(CoordinatorEntity, SensorEntity):
             "identifiers": {(DOMAIN, str(device_id))},
             "name": device_name,
             "manufacturer": "Prizrak",
+            "model": device_model,
+            "suggested_area": "Garage",
         }
 
     @property

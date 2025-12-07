@@ -34,6 +34,7 @@ async def async_setup_entry(
                 break
 
         device_name = device_info.get('name', f"Prizrak {device_id}") if device_info else f"Prizrak {device_id}"
+        device_model = device_info.get('model', 'Unknown') if device_info else 'Unknown'
 
         for button_key, (name, command, icon) in BUTTON_TYPES.items():
             entities.append(
@@ -41,6 +42,7 @@ async def async_setup_entry(
                     coordinator,
                     device_id,
                     device_name,
+                    device_model,
                     button_key,
                     name,
                     command,
@@ -59,6 +61,7 @@ class PrizrakButton(CoordinatorEntity, ButtonEntity):
         coordinator: PrizrakDataUpdateCoordinator,
         device_id: int,
         device_name: str,
+        device_model: str,
         button_key: str,
         name: str,
         command: str,
@@ -80,6 +83,8 @@ class PrizrakButton(CoordinatorEntity, ButtonEntity):
             "identifiers": {(DOMAIN, str(device_id))},
             "name": device_name,
             "manufacturer": "Prizrak",
+            "model": device_model,
+            "suggested_area": "Garage",
         }
 
     async def async_press(self) -> None:
