@@ -26,13 +26,8 @@ async def async_setup_entry(
 
     # Create sensors for each device
     entities = []
-    for device_id in coordinator.devices.keys():
-        device_data = coordinator.client.devices
-        device_info = None
-        for dev in device_data:
-            if dev['device_id'] == device_id:
-                device_info = dev
-                break
+    for device_info in coordinator.client.devices:
+        device_id = device_info['device_id']
 
         device_name = device_info.get('name', f"Prizrak {device_id}") if device_info else f"Prizrak {device_id}"
         device_model = device_info.get('model', 'Unknown') if device_info else 'Unknown'
