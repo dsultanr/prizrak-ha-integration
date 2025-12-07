@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import Any
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.util import dt as dt_util
 
 from .client import PrizrakClient
 from .const import DOMAIN
@@ -40,6 +42,9 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
 
         # Merge new state with existing
         self.devices[device_id].update(device_state)
+
+        # Add timestamp of last update
+        self.devices[device_id]["last_update"] = dt_util.utcnow().isoformat()
 
         # Notify all listeners (entities) about the update
         self.async_set_updated_data(self.devices)

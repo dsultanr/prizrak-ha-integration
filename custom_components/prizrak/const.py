@@ -14,6 +14,7 @@ SENSOR_TYPES = {
     "connection": ("Connection", None, None, "mdi:connection", "connection_state"),
     "guard": ("Guard Status", None, None, "mdi:shield-check", "guard"),
     "alarm": ("Alarm Status", None, None, "mdi:alarm-light", "alarm"),
+    "last_update": ("Last Update", None, SensorDeviceClass.TIMESTAMP, "mdi:clock-outline", "last_update"),
 
     # GPS
     "latitude": ("Latitude", "°", None, "mdi:map-marker", "geo.lat"),
