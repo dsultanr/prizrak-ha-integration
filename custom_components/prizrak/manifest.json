@@ -1,0 +1,14 @@
+{
+  "domain": "prizrak",
+  "name": "Prizrak Monitoring",
+  "codeowners": ["@dsultanr"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/dsultanr/prizrak-ha-integration",
+  "integration_type": "hub",
+  "iot_class": "cloud_push",
+  "requirements": [
+    "websockets>=12.0"
+  ],
+  "version": "1.0.0"
+}

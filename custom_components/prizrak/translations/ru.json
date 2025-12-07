@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Prizrak Мониторинг",
+        "description": "Введите учетные данные от monitoring.tecel.ru",
+        "data": {
+          "email": "Email",
+          "password": "Пароль"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Неверный email или пароль",
+      "cannot_connect": "Не удалось подключиться к серверам Prizrak",
+      "unknown": "Произошла неизвестная ошибка"
+    },
+    "abort": {
+      "already_configured": "Этот аккаунт уже настроен"
+    }
+  }
+}

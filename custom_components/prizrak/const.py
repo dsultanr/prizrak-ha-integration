@@ -1,0 +1,72 @@
+"""Constants for the Prizrak Monitoring integration."""
+
+DOMAIN = "prizrak"
+CONF_EMAIL = "email"
+CONF_PASSWORD = "password"
+
+PLATFORMS = ["sensor", "binary_sensor", "button"]
+
+# Sensor definitions: (name, unit, device_class, icon, state_key)
+SENSOR_TYPES = {
+    "serial_no": ("Serial Number", None, None, "mdi:identifier", "serial_no"),
+    "connection": ("Connection", None, None, "mdi:connection", "connection_state"),
+    "guard": ("Guard Status", None, None, "mdi:shield-check", "guard"),
+    "alarm": ("Alarm Status", None, None, "mdi:alarm-light", "alarm"),
+
+    # GPS
+    "latitude": ("Latitude", "°", None, "mdi:map-marker", "geo.lat"),
+    "longitude": ("Longitude", "°", None, "mdi:map-marker", "geo.lon"),
+    "gps_state": ("GPS State", None, None, "mdi:crosshairs-gps", "geo.gps_state"),
+    "gnss_speed": ("GNSS Speed", "km/h", "speed", "mdi:speedometer", "geo_ext.gnss_speed"),
+    "altitude": ("Altitude", "m", "distance", "mdi:altimeter", "geo_ext.gnss_height"),
+    "satellites": ("Satellites", None, None, "mdi:satellite-variant", "geo_ext.gnss_sat_used"),
+    "azimuth": ("Azimuth", "°", None, "mdi:compass", "geo_ext.gnss_azimuth"),
+
+    # Telemetry
+    "battery_voltage": ("Battery Voltage", "V", "voltage", "mdi:car-battery", "accum_voltage"),
+    "fuel_level": ("Fuel Level", "L", None, "mdi:gas-station", "fuel_level"),
+    "temperature": ("Inside Temperature", "°C", "temperature", "mdi:thermometer", "inside_temp"),
+    "outside_temperature": ("Outside Temperature", "°C", "temperature", "mdi:thermometer", "outside_temp"),
+    "engine_temperature": ("Engine Temperature", "°C", "temperature", "mdi:engine", "engine_temp"),
+    "speed": ("Speed", "km/h", "speed", "mdi:speedometer", "speed"),
+    "rpm": ("Engine RPM", "RPM", None, "mdi:engine", "rpm"),
+    "odometer": ("Odometer", "km", "distance", "mdi:counter", "route"),
+
+    # Engine & Systems
+    "ignition": ("Ignition", None, None, "mdi:key", "ignition_switch"),
+    "parking_brake": ("Parking Brake", None, None, "mdi:car-brake-parking", "parking_brake"),
+
+    # GSM
+    "gsm_level": ("GSM Signal", "%", None, "mdi:signal", "gsm_level"),
+    "sim_vendor": ("SIM Operator", None, None, "mdi:sim", "sim_1_vendor"),
+    "sim_balance": ("SIM Balance", None, None, "mdi:cash", "balance.value"),
+
+    # Heating
+    "driver_seat_heating": ("Driver Seat Heating", None, None, "mdi:car-seat-heater", "driver_seat_heating_state"),
+    "front_pass_seat_heating": ("Passenger Seat Heating", None, None, "mdi:car-seat-heater", "front_pass_seat_heating_state"),
+    "rear_left_seat_heating": ("Rear Left Seat Heating", None, None, "mdi:car-seat-heater", "rear_left_seat_heating_state"),
+    "rear_right_seat_heating": ("Rear Right Seat Heating", None, None, "mdi:car-seat-heater", "rear_right_seat_heating_state"),
+    "front_window_heating": ("Front Window Heating", None, None, "mdi:car-defrost-front", "front_window_heating_state"),
+    "rear_window_heating": ("Rear Window Heating", None, None, "mdi:car-defrost-rear", "rear_window_heating_state"),
+    "mirror_heating": ("Mirror Heating", None, None, "mdi:mirror", "mirror_heating_state"),
+    "wheel_heating": ("Wheel Heating", None, None, "mdi:steering", "wheel_heating_state"),
+}
+
+# Binary sensor definitions: (name, device_class, state_key)
+BINARY_SENSOR_TYPES = {
+    "driver_door": ("Driver Door", "door", "driver_door"),
+    "front_pass_door": ("Passenger Door", "door", "front_pass_door"),
+    "rear_left_door": ("Rear Left Door", "door", "rear_left_door"),
+    "rear_right_door": ("Rear Right Door", "door", "rear_right_door"),
+    "trunk": ("Trunk", "door", "trunk"),
+    "hood": ("Hood", "door", "hood"),
+    "central_lock": ("Central Lock", "lock", "central_lock"),
+}
+
+# Button definitions: (name, command, icon)
+BUTTON_TYPES = {
+    "guard_on": ("Guard On", "GuardOn", "mdi:shield-check"),
+    "guard_off": ("Guard Off", "GuardOff", "mdi:shield-off"),
+    "autolaunch_on": ("Autolaunch On", "AutolaunchOn", "mdi:engine"),
+    "autolaunch_off": ("Autolaunch Off", "AutolaunchOff", "mdi:engine-off"),
+}

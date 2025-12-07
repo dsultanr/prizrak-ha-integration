@@ -1,0 +1,5 @@
+{
+  "name": "Prizrak Monitoring",
+  "render_readme": true,
+  "domains": ["sensor", "binary_sensor", "button"]
+}
