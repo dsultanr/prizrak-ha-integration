@@ -69,10 +69,10 @@ class PrizrakButton(CoordinatorEntity, ButtonEntity):
         self._button_key = button_key
         self._command = command
 
-        # Entity name without device name prefix
-        self._attr_name = name
+        # Entity name and ID
+        self._attr_name = name  # Friendly name shown in UI
         self._attr_unique_id = f"prizrak_{device_id}_{button_key}"
-        self._attr_has_entity_name = True
+        self.entity_id = f"button.prizrak_{device_id}_{button_key}"  # Force entity_id
         self._attr_icon = icon
 
         # Device info for grouping
