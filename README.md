@@ -80,62 +80,63 @@ cards:
   - type: entities
     title: Статус автомобиля
     entities:
-      - entity: sensor.kodiak_connection
-      - entity: sensor.kodiak_guard_status
-      - entity: sensor.kodiak_alarm_status
-      - entity: sensor.kodiak_battery_voltage
-      - entity: sensor.kodiak_gsm_signal
+      - entity: sensor.prizrak_95311_connection
+      - entity: sensor.prizrak_95311_guard_status
+      - entity: sensor.prizrak_95311_alarm_status
+      - entity: sensor.prizrak_95311_battery_voltage
+      - entity: sensor.prizrak_95311_gsm_signal
+      - entity: sensor.prizrak_95311_last_update
 
   - type: horizontal-stack
     cards:
       - type: button
         name: Охрана Вкл
-        entity: button.kodiak_guard_on
+        entity: button.prizrak_95311_guard_on
         icon: mdi:shield-check
         tap_action:
           action: call-service
           service: button.press
           target:
-            entity_id: button.kodiak_guard_on
+            entity_id: button.prizrak_95311_guard_on
       - type: button
         name: Охрана Выкл
-        entity: button.kodiak_guard_off
+        entity: button.prizrak_95311_guard_off
         icon: mdi:shield-off
         tap_action:
           action: call-service
           service: button.press
           target:
-            entity_id: button.kodiak_guard_off
+            entity_id: button.prizrak_95311_guard_off
 
   - type: entities
     title: Двери и замки
     entities:
-      - entity: binary_sensor.kodiak_driver_door
-      - entity: binary_sensor.kodiak_passenger_door
-      - entity: binary_sensor.kodiak_rear_left_door
-      - entity: binary_sensor.kodiak_rear_right_door
-      - entity: binary_sensor.kodiak_trunk
-      - entity: binary_sensor.kodiak_hood
-      - entity: binary_sensor.kodiak_central_lock
+      - entity: binary_sensor.prizrak_95311_driver_door
+      - entity: binary_sensor.prizrak_95311_passenger_door
+      - entity: binary_sensor.prizrak_95311_rear_left_door
+      - entity: binary_sensor.prizrak_95311_rear_right_door
+      - entity: binary_sensor.prizrak_95311_trunk
+      - entity: binary_sensor.prizrak_95311_hood
+      - entity: binary_sensor.prizrak_95311_central_lock
 
   - type: entities
     title: Телеметрия
     entities:
-      - entity: sensor.kodiak_speed
-      - entity: sensor.kodiak_engine_rpm
-      - entity: sensor.kodiak_odometer
-      - entity: sensor.kodiak_fuel_level
-      - entity: sensor.kodiak_inside_temperature
-      - entity: sensor.kodiak_engine_temperature
+      - entity: sensor.prizrak_95311_speed
+      - entity: sensor.prizrak_95311_engine_rpm
+      - entity: sensor.prizrak_95311_odometer
+      - entity: sensor.prizrak_95311_fuel_level
+      - entity: sensor.prizrak_95311_inside_temperature
+      - entity: sensor.prizrak_95311_engine_temperature
 
   - type: map
     entities:
-      - entity: sensor.kodiak_latitude
+      - entity: sensor.prizrak_95311_latitude
     hours_to_show: 24
     aspect_ratio: "16:9"
 ```
 
-**Примечание:** Замените `kodiak` на имя вашего устройства (в нижнем регистре, пробелы заменены на подчеркивания).
+**Примечание:** Замените `95311` на ID вашего устройства (можно узнать из логов или entity_id).
 
 ## Сенсоры
 
