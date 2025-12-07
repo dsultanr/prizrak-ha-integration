@@ -1,4 +1,6 @@
 """Constants for the Prizrak Monitoring integration."""
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass
 
 DOMAIN = "prizrak"
 CONF_EMAIL = "email"
@@ -17,20 +19,20 @@ SENSOR_TYPES = {
     "latitude": ("Latitude", "°", None, "mdi:map-marker", "geo.lat"),
     "longitude": ("Longitude", "°", None, "mdi:map-marker", "geo.lon"),
     "gps_state": ("GPS State", None, None, "mdi:crosshairs-gps", "geo.gps_state"),
-    "gnss_speed": ("GNSS Speed", "km/h", "speed", "mdi:speedometer", "geo_ext.gnss_speed"),
-    "altitude": ("Altitude", "m", "distance", "mdi:altimeter", "geo_ext.gnss_height"),
+    "gnss_speed": ("GNSS Speed", "km/h", SensorDeviceClass.SPEED, "mdi:speedometer", "geo_ext.gnss_speed"),
+    "altitude": ("Altitude", "m", SensorDeviceClass.DISTANCE, "mdi:altimeter", "geo_ext.gnss_height"),
     "satellites": ("Satellites", None, None, "mdi:satellite-variant", "geo_ext.gnss_sat_used"),
     "azimuth": ("Azimuth", "°", None, "mdi:compass", "geo_ext.gnss_azimuth"),
 
     # Telemetry
-    "battery_voltage": ("Battery Voltage", "V", "voltage", "mdi:car-battery", "accum_voltage"),
+    "battery_voltage": ("Battery Voltage", "V", SensorDeviceClass.VOLTAGE, "mdi:car-battery", "accum_voltage"),
     "fuel_level": ("Fuel Level", "L", None, "mdi:gas-station", "fuel_level"),
-    "temperature": ("Inside Temperature", "°C", "temperature", "mdi:thermometer", "inside_temp"),
-    "outside_temperature": ("Outside Temperature", "°C", "temperature", "mdi:thermometer", "outside_temp"),
-    "engine_temperature": ("Engine Temperature", "°C", "temperature", "mdi:engine", "engine_temp"),
-    "speed": ("Speed", "km/h", "speed", "mdi:speedometer", "speed"),
+    "temperature": ("Inside Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:thermometer", "inside_temp"),
+    "outside_temperature": ("Outside Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:thermometer", "outside_temp"),
+    "engine_temperature": ("Engine Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:engine", "engine_temp"),
+    "speed": ("Speed", "km/h", SensorDeviceClass.SPEED, "mdi:speedometer", "speed"),
     "rpm": ("Engine RPM", "RPM", None, "mdi:engine", "rpm"),
-    "odometer": ("Odometer", "km", "distance", "mdi:counter", "route"),
+    "odometer": ("Odometer", "km", SensorDeviceClass.DISTANCE, "mdi:counter", "route"),
 
     # Engine & Systems
     "ignition": ("Ignition", None, None, "mdi:key", "ignition_switch"),
@@ -54,13 +56,13 @@ SENSOR_TYPES = {
 
 # Binary sensor definitions: (name, device_class, state_key)
 BINARY_SENSOR_TYPES = {
-    "driver_door": ("Driver Door", "door", "driver_door"),
-    "front_pass_door": ("Passenger Door", "door", "front_pass_door"),
-    "rear_left_door": ("Rear Left Door", "door", "rear_left_door"),
-    "rear_right_door": ("Rear Right Door", "door", "rear_right_door"),
-    "trunk": ("Trunk", "door", "trunk"),
-    "hood": ("Hood", "door", "hood"),
-    "central_lock": ("Central Lock", "lock", "central_lock"),
+    "driver_door": ("Driver Door", BinarySensorDeviceClass.DOOR, "driver_door"),
+    "front_pass_door": ("Passenger Door", BinarySensorDeviceClass.DOOR, "front_pass_door"),
+    "rear_left_door": ("Rear Left Door", BinarySensorDeviceClass.DOOR, "rear_left_door"),
+    "rear_right_door": ("Rear Right Door", BinarySensorDeviceClass.DOOR, "rear_right_door"),
+    "trunk": ("Trunk", BinarySensorDeviceClass.DOOR, "trunk"),
+    "hood": ("Hood", BinarySensorDeviceClass.DOOR, "hood"),
+    "central_lock": ("Central Lock", BinarySensorDeviceClass.LOCK, "central_lock"),
 }
 
 # Button definitions: (name, command, icon)

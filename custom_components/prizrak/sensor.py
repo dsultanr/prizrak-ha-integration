@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -23,9 +23,6 @@ async def async_setup_entry(
 ) -> None:
     """Set up Prizrak sensor based on a config entry."""
     coordinator: PrizrakDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-    # Wait a bit for initial data
-    await coordinator.async_config_entry_first_refresh()
 
     # Create sensors for each device
     entities = []

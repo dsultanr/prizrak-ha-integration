@@ -23,9 +23,6 @@ async def async_setup_entry(
     """Set up Prizrak button based on a config entry."""
     coordinator: PrizrakDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
-    # Wait a bit for initial data
-    await coordinator.async_config_entry_first_refresh()
-
     # Create buttons for each device
     entities = []
     for device_id in coordinator.devices.keys():

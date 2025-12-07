@@ -54,6 +54,9 @@ class PrizrakClient:
         self.ping_interval = 15
         self.last_ping_time = 0
 
+        # Event to signal when devices are ready
+        self.devices_ready = asyncio.Event()
+
     def _get_fingerprint_token(self) -> str:
         """Generate fingerprint token for vtoken."""
         data = {
@@ -380,6 +383,11 @@ class PrizrakClient:
 
                                 device_ids = [d['device_id'] for d in devices_data]
                                 await self.watch_devices(device_ids)
+
+                                # Signal that devices are ready
+                                if not self.devices_ready.is_set():
+                                    self.devices_ready.set()
+                                    _LOGGER.info("Devices ready event set")
 
                 except json.JSONDecodeError:
                     _LOGGER.debug(f"Non-JSON message")

@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .client import PrizrakClient
@@ -27,6 +27,7 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
         self.client = client
         self.devices: dict[int, dict[str, Any]] = {}
 
+    @callback
     def handle_device_update(self, device_id: int, device_state: dict[str, Any]) -> None:
         """Handle device state update from WebSocket.
 

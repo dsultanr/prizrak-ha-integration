@@ -25,11 +25,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Create coordinator
     coordinator = PrizrakDataUpdateCoordinator(hass, None)
 
-    # Create client with coordinator callback
+    # Create client with coordinator callback that schedules updates in HA event loop
+    def state_update_callback(device_id: int, state: dict) -> None:
+        """Schedule state update in HA event loop."""
+        hass.loop.call_soon_threadsafe(
+            coordinator.handle_device_update, device_id, state
+        )
+
     client = PrizrakClient(
         email,
         password,
-        lambda device_id, state: coordinator.handle_device_update(device_id, state)
+        state_update_callback
     )
 
     # Store client in coordinator
@@ -52,6 +58,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Store task for cleanup
     hass.data[DOMAIN][f"{entry.entry_id}_task"] = task
+
+    # Wait for devices to be ready (with timeout)
+    try:
+        _LOGGER.info("Waiting for devices to be ready...")
+        await asyncio.wait_for(client.devices_ready.wait(), timeout=30.0)
+        _LOGGER.info("Devices are ready, setting up platforms")
+    except asyncio.TimeoutError:
+        _LOGGER.error("Timeout waiting for devices, setting up platforms anyway")
 
     # Setup platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
