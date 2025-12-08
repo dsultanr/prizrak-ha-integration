@@ -35,8 +35,21 @@ async def _setup_www_files(hass: HomeAssistant) -> None:
             _LOGGER.debug("No www files found in integration directory")
             return
 
-        # Create destination directory
-        await hass.async_add_executor_job(dest_dir.mkdir, True, True)
+        # Create destination directory with proper permissions
+        def setup_dest_dir():
+            if dest_dir.exists():
+                # Fix permissions if directory already exists
+                try:
+                    dest_dir.chmod(0o755)
+                    _LOGGER.debug("Fixed permissions for existing www/prizrak/ directory")
+                except Exception as e:
+                    _LOGGER.warning(f"Could not fix permissions for www/prizrak/: {e}")
+            else:
+                # Create with proper permissions
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                dest_dir.chmod(0o755)
+
+        await hass.async_add_executor_job(setup_dest_dir)
 
         # Copy all SVG and PNG files
         copied_count = 0
@@ -45,7 +58,11 @@ async def _setup_www_files(hass: HomeAssistant) -> None:
                 dest_file = dest_dir / file.name
                 try:
                     # Always overwrite to ensure latest version
-                    await hass.async_add_executor_job(shutil.copy2, file, dest_file)
+                    def copy_with_perms():
+                        shutil.copy2(file, dest_file)
+                        dest_file.chmod(0o644)
+
+                    await hass.async_add_executor_job(copy_with_perms)
                     copied_count += 1
                 except Exception as e:
                     _LOGGER.warning(f"Failed to copy {file.name}: {e}")
