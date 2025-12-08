@@ -1,0 +1,22 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Оранжевый круг фон -->
+  <circle cx="40" cy="40" r="35" fill="#FF8C00" filter="url(#shadow)" opacity="0.9" />
+
+  <!-- Иконка двигателя (белая) -->
+  <g fill="#FFFFFF" transform="translate(20, 20)">
+    <path d="M 5 15 L 5 25 L 35 25 L 35 15 L 32 15 L 32 10 L 28 10 L 28 15 L 22 15 L 22 10 L 18 10 L 18 15 L 12 15 L 12 10 L 8 10 L 8 15 Z" />
+    <rect x="10" y="27" width="20" height="8" rx="2" />
+    <circle cx="15" cy="20" r="2" />
+    <circle cx="25" cy="20" r="2" />
+  </g>
+</svg>

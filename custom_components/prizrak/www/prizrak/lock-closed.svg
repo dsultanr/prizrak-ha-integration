@@ -1,0 +1,27 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Голубой круг фон -->
+  <circle cx="40" cy="40" r="35" fill="#00D4FF" filter="url(#shadow)" opacity="0.9" />
+
+  <!-- Иконка закрытого замка (белая) -->
+  <g fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2">
+    <!-- Дужка замка -->
+    <path d="M 30 35 L 30 28 Q 30 20 40 20 Q 50 20 50 28 L 50 35" fill="none" />
+
+    <!-- Корпус замка -->
+    <rect x="25" y="35" width="30" height="20" rx="3" />
+
+    <!-- Замочная скважина -->
+    <circle cx="40" cy="43" r="3" fill="#00D4FF" />
+    <rect x="38" y="43" width="4" height="6" fill="#00D4FF" />
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="door-glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Желтая подсветка капота -->
+  <g filter="url(#door-glow)">
+    <path d="M 150 80 L 150 50 Q 200 30 250 50 L 250 80"
+          stroke="#FFD700"
+          stroke-width="10"
+          fill="none"
+          opacity="0.8" />
+    <path d="M 150 80 L 150 50 Q 200 30 250 50 L 250 80"
+          stroke="#FFA500"
+          stroke-width="6"
+          fill="none"
+          opacity="0.9" />
+  </g>
+</svg>

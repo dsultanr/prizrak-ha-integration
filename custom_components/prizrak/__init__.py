@@ -3,6 +3,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+import shutil
+from pathlib import Path
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
@@ -17,8 +20,49 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON]
 
 
+async def _setup_www_files(hass: HomeAssistant) -> None:
+    """Copy SVG files to www directory."""
+    try:
+        # Source: integration's www directory
+        integration_path = Path(__file__).parent
+        source_dir = integration_path / "www" / "prizrak"
+
+        # Destination: HA's www directory
+        www_dir = Path(hass.config.path("www"))
+        dest_dir = www_dir / "prizrak"
+
+        if not source_dir.exists():
+            _LOGGER.debug("No www files found in integration directory")
+            return
+
+        # Create destination directory
+        await hass.async_add_executor_job(dest_dir.mkdir, True, True)
+
+        # Copy all SVG files
+        copied_count = 0
+        for svg_file in source_dir.glob("*.svg"):
+            dest_file = dest_dir / svg_file.name
+            try:
+                # Always overwrite to ensure latest version
+                await hass.async_add_executor_job(shutil.copy2, svg_file, dest_file)
+                copied_count += 1
+            except Exception as e:
+                _LOGGER.warning(f"Failed to copy {svg_file.name}: {e}")
+
+        if copied_count > 0:
+            _LOGGER.info(f"Installed {copied_count} SVG files to www/prizrak/")
+
+    except PermissionError:
+        _LOGGER.error("Permission denied when copying SVG files. Check file permissions for /config/www/")
+    except Exception as e:
+        _LOGGER.warning(f"Failed to setup www files: {e}")
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Prizrak from a config entry."""
+    # Copy SVG files on first setup
+    await _setup_www_files(hass)
+
     email = entry.data[CONF_EMAIL]
     password = entry.data[CONF_PASSWORD]
 

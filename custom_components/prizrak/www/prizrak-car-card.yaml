@@ -1,0 +1,299 @@
+type: picture-elements
+image: /local/prizrak/car-base.svg  # Базовая машина (серый контур)
+
+elements:
+  # ============================================
+  # GUARD STATUS - голубая подсветка вокруг
+  # ============================================
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_guard
+        state_not: 'SafeGuardOff'
+    elements:
+      - type: image
+        image: /local/prizrak/car-guard-glow.svg  # Голубое свечение вокруг
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  # ============================================
+  # AUTOLAUNCH - белый контур + фары + стоп-сигналы
+  # ============================================
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_ignition
+        state: 'On'
+    elements:
+      - type: image
+        image: /local/prizrak/car-autolaunch.svg  # Белый контур, фары, стоп-сигналы
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+      - type: image
+        image: /local/prizrak/car-engine-icon.svg  # Иконка двигателя на капоте (оранжевый круг)
+        style:
+          top: 30%
+          left: 50%
+          width: 15%
+        tap_action: none
+
+  # ============================================
+  # ДВЕРИ - желтая подсветка
+  # ============================================
+
+  # Водительская дверь
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_driver_door
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-door-driver.svg  # Желтая подсветка водительской двери
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  # Пассажирская дверь
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_front_pass_door
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-door-passenger.svg  # Желтая подсветка пассажирской двери
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  # Задняя левая дверь
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_rear_left_door
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-door-rear-left.svg  # Желтая подсветка задней левой двери
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  # Задняя правая дверь
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_rear_right_door
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-door-rear-right.svg  # Желтая подсветка задней правой двери
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  # Багажник
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_trunk
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-door-trunk.svg  # Желтая подсветка багажника
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  # Капот
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_hood
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-door-hood.svg  # Желтая подсветка капота
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  # ============================================
+  # ЦЕНТРАЛЬНАЯ ИКОНКА ЗАМКА
+  # ============================================
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_guard
+        state_not: 'SafeGuardOff'
+    elements:
+      - type: image
+        image: /local/prizrak/lock-closed.svg  # Закрытый замок в голубом круге
+        style:
+          top: 50%
+          left: 50%
+          width: 12%
+        tap_action: none
+
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_guard
+        state: 'SafeGuardOff'
+    elements:
+      - type: image
+        image: /local/prizrak/lock-open.svg  # Открытый замок
+        style:
+          top: 50%
+          left: 50%
+          width: 12%
+        tap_action: none
+
+  # ============================================
+  # ИНФОРМАЦИЯ ПО УГЛАМ
+  # ============================================
+
+  # Верхний левый - Батарея
+  - type: state-label
+    entity: sensor.prizrak_95311_battery_voltage
+    style:
+      top: 18%
+      left: 15%
+      font-size: 28px
+      font-weight: bold
+      color: white
+    suffix: ' В'
+
+  # Верхний правый - Температура двигателя
+  - type: state-label
+    entity: sensor.prizrak_95311_engine_temperature
+    style:
+      top: 18%
+      right: 15%
+      font-size: 28px
+      font-weight: bold
+      color: white
+    suffix: ' °C'
+
+  # Нижний левый - Топливо
+  - type: state-label
+    entity: sensor.prizrak_95311_fuel_level
+    style:
+      bottom: 35%
+      left: 15%
+      font-size: 28px
+      font-weight: bold
+      color: white
+    suffix: ' л'
+
+  # Нижний правый - Температура снаружи
+  - type: state-label
+    entity: sensor.prizrak_95311_outside_temperature
+    style:
+      bottom: 35%
+      right: 15%
+      font-size: 28px
+      font-weight: bold
+      color: white
+    suffix: ' °C'
+
+  # Центр (температура салона) - под замком
+  - type: state-label
+    entity: sensor.prizrak_95311_temperature
+    style:
+      top: 55%
+      left: 50%
+      font-size: 32px
+      font-weight: bold
+      color: white
+    suffix: ' °C'
+
+  # ============================================
+  # СКОРОСТЬ И ОБОРОТЫ (при автозапуске)
+  # ============================================
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_ignition
+        state: 'On'
+    elements:
+      # Скорость (слева внизу от машины)
+      - type: state-label
+        entity: sensor.prizrak_95311_speed
+        style:
+          bottom: 20%
+          left: 30%
+          font-size: 24px
+          font-weight: bold
+          color: white
+      - type: state-label
+        entity: sensor.prizrak_95311_speed
+        attribute: unit_of_measurement
+        style:
+          bottom: 15%
+          left: 30%
+          font-size: 14px
+          color: rgba(255,255,255,0.7)
+        prefix: 'км/ч'
+
+      # Обороты (справа внизу от машины)
+      - type: state-label
+        entity: sensor.prizrak_95311_rpm
+        style:
+          bottom: 20%
+          right: 30%
+          font-size: 24px
+          font-weight: bold
+          color: white
+      - type: state-label
+        entity: sensor.prizrak_95311_rpm
+        attribute: unit_of_measurement
+        style:
+          bottom: 15%
+          right: 30%
+          font-size: 14px
+          color: rgba(255,255,255,0.7)
+        prefix: 'об/м'
+
+  # ============================================
+  # ИКОНКИ ПО УГЛАМ
+  # ============================================
+  - type: icon
+    icon: mdi:car-battery
+    style:
+      top: 14%
+      left: 15%
+      color: rgba(255,255,255,0.7)
+      '--mdi-icon-size': 24px
+
+  - type: icon
+    icon: mdi:thermometer
+    style:
+      top: 14%
+      right: 15%
+      color: rgba(255,255,255,0.7)
+      '--mdi-icon-size': 24px
+
+  - type: icon
+    icon: mdi:gas-station
+    style:
+      bottom: 39%
+      left: 15%
+      color: rgba(255,255,255,0.7)
+      '--mdi-icon-size': 24px
+
+  - type: icon
+    icon: mdi:weather-cloudy
+    style:
+      bottom: 39%
+      right: 15%
+      color: rgba(255,255,255,0.7)
+      '--mdi-icon-size': 24px
