@@ -1,9 +1,6 @@
 type: picture-elements
 image: /local/prizrak/car-base.png
-style: |
-  ha-card {
-    padding-bottom: 60px;
-  }
+aspect_ratio: 56%
 
 elements:
   # Autolaunch mode (ignition on) - white outline with lights
@@ -342,8 +339,8 @@ elements:
       - type: icon
         icon: mdi:shield-lock
         style:
-          bottom: 3%
-          left: 35%
+          top: 92%
+          left: 30%
           --mdc-icon-size: 50px
           color: rgba(150,150,150,0.8)
         tap_action:
@@ -365,8 +362,8 @@ elements:
       - type: icon
         icon: mdi:shield-lock
         style:
-          bottom: 3%
-          left: 35%
+          top: 92%
+          left: 30%
           --mdc-icon-size: 50px
           color: rgba(33,150,243,1)
         tap_action:
@@ -388,8 +385,8 @@ elements:
       - type: icon
         icon: mdi:engine
         style:
-          bottom: 3%
-          right: 35%
+          top: 92%
+          left: 70%
           --mdc-icon-size: 50px
           color: rgba(150,150,150,0.8)
         tap_action:
@@ -411,8 +408,8 @@ elements:
       - type: icon
         icon: mdi:engine
         style:
-          bottom: 3%
-          right: 35%
+          top: 92%
+          left: 70%
           --mdc-icon-size: 50px
           color: rgba(255,152,0,1)
         tap_action:
