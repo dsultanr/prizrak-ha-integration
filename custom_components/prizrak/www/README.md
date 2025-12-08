@@ -10,7 +10,7 @@ SVG файлы автоматически копируются в `/config/www/p
 
 1. Откройте Dashboard в режиме редактирования
 2. Добавьте новую карточку → Вручную (Manual)
-3. Скопируйте содержимое `prizrak-car-card.yaml`
+3. Скопируйте содержимое из `examples/car-card.yaml` (в репозитории на GitHub)
 4. Замените `95311` на ID вашего устройства
 5. Сохраните
 
@@ -48,33 +48,13 @@ SVG файлы автоматически копируются в `/config/www/p
 
 Все SVG имеют viewBox="0 0 400 600" для правильного наложения слоев.
 
-## Пример с кнопками управления
+## Встроенные кнопки управления
 
-```yaml
-type: vertical-stack
-cards:
-  - type: picture-elements
-    # ... содержимое prizrak-car-card.yaml ...
+Карточка уже включает кнопки управления охраной и автозапуском внизу:
 
-  - type: horizontal-stack
-    cards:
-      - type: button
-        name: Охрана Вкл
-        entity: button.prizrak_95311_guard_on
-        icon: mdi:shield-check
-        tap_action:
-          action: call-service
-          service: button.press
-          target:
-            entity_id: button.prizrak_95311_guard_on
+- **Охрана** (слева): зеленая/красная иконка щита
+- **Автозапуск** (справа): синяя/оранжевая иконка двигателя
 
-      - type: button
-        name: Охрана Выкл
-        entity: button.prizrak_95311_guard_off
-        icon: mdi:shield-off
-        tap_action:
-          action: call-service
-          service: button.press
-          target:
-            entity_id: button.prizrak_95311_guard_off
-```
+Кнопки активируются **долгим нажатием** с подтверждением для защиты от случайных нажатий.
+
+Полный пример карточки доступен в `examples/car-card.yaml` в репозитории.

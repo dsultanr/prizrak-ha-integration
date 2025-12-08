@@ -1,0 +1,408 @@
+type: picture-elements
+image: /local/prizrak/car-base.png
+
+elements:
+  # Autolaunch mode (ignition on) - white outline with lights
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_ignition
+        state: 'On'
+    elements:
+      - type: image
+        image: /local/prizrak/car-autolaunch.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+      - type: image
+        image: /local/prizrak/car-engine-icon.svg
+        style:
+          top: 20%
+          left: 50%
+          width: 10%
+        tap_action: none
+
+  # Guard mode (when not in autolaunch) - blue glow
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_guard
+        state_not: 'SafeGuardOff'
+      - entity: sensor.prizrak_95311_ignition
+        state_not: 'On'
+    elements:
+      - type: image
+        image: /local/prizrak/car-guard-glow.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_driver_door
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-left.png
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+      - type: image
+        image: /local/prizrak/car-door-driver.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_front_pass_door
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-right.png
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+      - type: image
+        image: /local/prizrak/car-door-passenger.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_rear_left_door
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-left.png
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+      - type: image
+        image: /local/prizrak/car-door-rear-left.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_rear_right_door
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-right.png
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+      - type: image
+        image: /local/prizrak/car-door-rear-right.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_hood
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-top.png
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+      - type: image
+        image: /local/prizrak/car-door-hood.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  - type: conditional
+    conditions:
+      - entity: binary_sensor.prizrak_95311_trunk
+        state: 'on'
+    elements:
+      - type: image
+        image: /local/prizrak/car-bottom.png
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+      - type: image
+        image: /local/prizrak/car-door-trunk.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 100%
+        tap_action: none
+
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_guard
+        state_not: 'SafeGuardOff'
+    elements:
+      - type: image
+        image: /local/prizrak/lock-closed.svg
+        style:
+          top: 50%
+          left: 50%
+          width: 8%
+        tap_action: none
+
+  # Speed display (shown when ignition is on)
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_ignition
+        state: 'On'
+    elements:
+      - type: state-label
+        entity: sensor.prizrak_95311_speed
+        style:
+          bottom: 6%
+          left: 15%
+          font-size: 32px
+          font-weight: bold
+          color: white
+          text-shadow: 3px 3px 6px rgba(0,0,0,0.9)
+        suffix: ' km/h'
+      - type: icon
+        icon: mdi:speedometer
+        style:
+          bottom: 2%
+          left: 15%
+          color: rgba(255,255,255,0.9)
+
+  # RPM display (shown when ignition is on)
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_ignition
+        state: 'On'
+    elements:
+      - type: state-label
+        entity: sensor.prizrak_95311_rpm
+        style:
+          bottom: 6%
+          right: 15%
+          font-size: 32px
+          font-weight: bold
+          color: white
+          text-shadow: 3px 3px 6px rgba(0,0,0,0.9)
+        suffix: ' RPM'
+      - type: icon
+        icon: mdi:engine
+        style:
+          bottom: 2%
+          right: 15%
+          color: rgba(255,255,255,0.9)
+
+  - type: state-label
+    entity: sensor.prizrak_95311_battery_voltage
+    style:
+      top: 12%
+      left: 12%
+      font-size: 24px
+      font-weight: bold
+      color: white
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+    suffix: ' В'
+
+  - type: state-label
+    entity: sensor.prizrak_95311_engine_temperature
+    style:
+      top: 12%
+      right: 12%
+      font-size: 24px
+      font-weight: bold
+      color: white
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+    suffix: ' °C'
+
+  - type: state-label
+    entity: sensor.prizrak_95311_fuel_level
+    style:
+      bottom: 12%
+      left: 12%
+      font-size: 24px
+      font-weight: bold
+      color: white
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+    suffix: ' л'
+
+  - type: state-label
+    entity: sensor.prizrak_95311_outside_temperature
+    style:
+      bottom: 12%
+      right: 12%
+      font-size: 24px
+      font-weight: bold
+      color: white
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+    suffix: ' °C'
+
+  - type: state-label
+    entity: sensor.prizrak_95311_temperature
+    style:
+      top: 54%
+      left: 50%
+      font-size: 28px
+      font-weight: bold
+      color: white
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+    suffix: ' °C'
+
+  - type: icon
+    icon: mdi:car-battery
+    style:
+      top: 8%
+      left: 12%
+      color: rgba(255,255,255,0.9)
+
+  - type: icon
+    icon: mdi:engine
+    style:
+      top: 8%
+      right: 12%
+      color: rgba(255,255,255,0.9)
+
+  - type: icon
+    icon: mdi:gas-station
+    style:
+      bottom: 8%
+      left: 12%
+      color: rgba(255,255,255,0.9)
+
+  - type: icon
+    icon: mdi:thermometer
+    style:
+      bottom: 8%
+      right: 12%
+      color: rgba(255,255,255,0.9)
+
+  # Guard control buttons (bottom center)
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_guard
+        state: 'SafeGuardOff'
+    elements:
+      - type: state-icon
+        entity: button.prizrak_95311_guard_on
+        icon: mdi:shield-check
+        style:
+          bottom: 2%
+          left: 42%
+          --mdc-icon-size: 48px
+          color: rgba(100,200,100,0.9)
+          background: rgba(0,0,0,0.5)
+          border-radius: 50%
+          padding: 8px
+        tap_action:
+          action: none
+        hold_action:
+          action: call-service
+          service: button.press
+          service_data:
+            entity_id: button.prizrak_95311_guard_on
+          confirmation:
+            text: "Включить охрану?"
+
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_guard
+        state_not: 'SafeGuardOff'
+    elements:
+      - type: state-icon
+        entity: button.prizrak_95311_guard_off
+        icon: mdi:shield-off
+        style:
+          bottom: 2%
+          left: 42%
+          --mdc-icon-size: 48px
+          color: rgba(255,100,100,0.9)
+          background: rgba(0,0,0,0.5)
+          border-radius: 50%
+          padding: 8px
+        tap_action:
+          action: none
+        hold_action:
+          action: call-service
+          service: button.press
+          service_data:
+            entity_id: button.prizrak_95311_guard_off
+          confirmation:
+            text: "Выключить охрану?"
+
+  # Autolaunch control buttons (bottom center-right)
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_ignition
+        state_not: 'On'
+    elements:
+      - type: state-icon
+        entity: button.prizrak_95311_autolaunch_on
+        icon: mdi:engine
+        style:
+          bottom: 2%
+          left: 52%
+          --mdc-icon-size: 48px
+          color: rgba(100,150,255,0.9)
+          background: rgba(0,0,0,0.5)
+          border-radius: 50%
+          padding: 8px
+        tap_action:
+          action: none
+        hold_action:
+          action: call-service
+          service: button.press
+          service_data:
+            entity_id: button.prizrak_95311_autolaunch_on
+          confirmation:
+            text: "Запустить двигатель?"
+
+  - type: conditional
+    conditions:
+      - entity: sensor.prizrak_95311_ignition
+        state: 'On'
+    elements:
+      - type: state-icon
+        entity: button.prizrak_95311_autolaunch_off
+        icon: mdi:engine-off
+        style:
+          bottom: 2%
+          left: 52%
+          --mdc-icon-size: 48px
+          color: rgba(255,150,100,0.9)
+          background: rgba(0,0,0,0.5)
+          border-radius: 50%
+          padding: 8px
+        tap_action:
+          action: none
+        hold_action:
+          action: call-service
+          service: button.press
+          service_data:
+            entity_id: button.prizrak_95311_autolaunch_off
+          confirmation:
+            text: "Заглушить двигатель?"

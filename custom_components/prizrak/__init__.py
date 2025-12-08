@@ -21,7 +21,7 @@ PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.B
 
 
 async def _setup_www_files(hass: HomeAssistant) -> None:
-    """Copy SVG files to www directory."""
+    """Copy visualization files (SVG, PNG) to www directory."""
     try:
         # Source: integration's www directory
         integration_path = Path(__file__).parent
@@ -38,19 +38,20 @@ async def _setup_www_files(hass: HomeAssistant) -> None:
         # Create destination directory
         await hass.async_add_executor_job(dest_dir.mkdir, True, True)
 
-        # Copy all SVG files
+        # Copy all SVG and PNG files
         copied_count = 0
-        for svg_file in source_dir.glob("*.svg"):
-            dest_file = dest_dir / svg_file.name
-            try:
-                # Always overwrite to ensure latest version
-                await hass.async_add_executor_job(shutil.copy2, svg_file, dest_file)
-                copied_count += 1
-            except Exception as e:
-                _LOGGER.warning(f"Failed to copy {svg_file.name}: {e}")
+        for file in source_dir.glob("*"):
+            if file.suffix in [".svg", ".png"]:
+                dest_file = dest_dir / file.name
+                try:
+                    # Always overwrite to ensure latest version
+                    await hass.async_add_executor_job(shutil.copy2, file, dest_file)
+                    copied_count += 1
+                except Exception as e:
+                    _LOGGER.warning(f"Failed to copy {file.name}: {e}")
 
         if copied_count > 0:
-            _LOGGER.info(f"Installed {copied_count} SVG files to www/prizrak/")
+            _LOGGER.info(f"Installed {copied_count} files to www/prizrak/")
 
     except PermissionError:
         _LOGGER.error("Permission denied when copying SVG files. Check file permissions for /config/www/")

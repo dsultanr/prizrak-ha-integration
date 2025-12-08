@@ -165,11 +165,11 @@ cards:
 
 1. Откройте Dashboard → Редактировать
 2. Добавить карточку → Вручную (Manual)
-3. Скопируйте содержимое из `/config/custom_components/prizrak/www/prizrak-car-card.yaml`
+3. Скопируйте содержимое из `examples/car-card.yaml` (в репозитории интеграции)
 4. Замените `95311` на ID вашего устройства
 5. Сохраните
 
-Подробности в файле `/config/custom_components/prizrak/www/README.md`
+Пример карточки: [examples/car-card.yaml](examples/car-card.yaml)
 
 ## Сенсоры
 
