@@ -1,5 +1,9 @@
 type: picture-elements
 image: /local/prizrak/car-base.png
+style: |
+  ha-card {
+    padding-bottom: 60px;
+  }
 
 elements:
   # Autolaunch mode (ignition on) - white outline with lights
@@ -23,7 +27,7 @@ elements:
           width: 10%
         tap_action: none
 
-  # Guard mode (when not in autolaunch) - blue glow
+  # Guard mode (when not in autolaunch) - blue rounded rectangle glow
   - type: conditional
     conditions:
       - entity: sensor.prizrak_95311_guard
@@ -39,6 +43,7 @@ elements:
           width: 100%
         tap_action: none
 
+  # Driver door
   - type: conditional
     conditions:
       - entity: binary_sensor.prizrak_95311_driver_door
@@ -59,6 +64,7 @@ elements:
           width: 100%
         tap_action: none
 
+  # Front passenger door
   - type: conditional
     conditions:
       - entity: binary_sensor.prizrak_95311_front_pass_door
@@ -79,6 +85,7 @@ elements:
           width: 100%
         tap_action: none
 
+  # Rear left door
   - type: conditional
     conditions:
       - entity: binary_sensor.prizrak_95311_rear_left_door
@@ -99,6 +106,7 @@ elements:
           width: 100%
         tap_action: none
 
+  # Rear right door
   - type: conditional
     conditions:
       - entity: binary_sensor.prizrak_95311_rear_right_door
@@ -119,6 +127,7 @@ elements:
           width: 100%
         tap_action: none
 
+  # Hood
   - type: conditional
     conditions:
       - entity: binary_sensor.prizrak_95311_hood
@@ -139,6 +148,7 @@ elements:
           width: 100%
         tap_action: none
 
+  # Trunk
   - type: conditional
     conditions:
       - entity: binary_sensor.prizrak_95311_trunk
@@ -159,6 +169,7 @@ elements:
           width: 100%
         tap_action: none
 
+  # Lock icon (when guard is on)
   - type: conditional
     conditions:
       - entity: sensor.prizrak_95311_guard
@@ -181,17 +192,17 @@ elements:
       - type: state-label
         entity: sensor.prizrak_95311_speed
         style:
-          bottom: 6%
+          bottom: 16%
           left: 15%
-          font-size: 32px
+          font-size: 20px
           font-weight: bold
           color: white
-          text-shadow: 3px 3px 6px rgba(0,0,0,0.9)
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.9)
         suffix: ' km/h'
       - type: icon
         icon: mdi:speedometer
         style:
-          bottom: 2%
+          bottom: 12%
           left: 15%
           color: rgba(255,255,255,0.9)
 
@@ -204,120 +215,137 @@ elements:
       - type: state-label
         entity: sensor.prizrak_95311_rpm
         style:
-          bottom: 6%
+          bottom: 16%
           right: 15%
-          font-size: 32px
+          font-size: 20px
           font-weight: bold
           color: white
-          text-shadow: 3px 3px 6px rgba(0,0,0,0.9)
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.9)
         suffix: ' RPM'
       - type: icon
         icon: mdi:engine
         style:
-          bottom: 2%
+          bottom: 12%
           right: 15%
           color: rgba(255,255,255,0.9)
+
+  # Battery voltage - top left
+  - type: icon
+    icon: mdi:car-battery
+    style:
+      top: 4%
+      left: 8%
+      color: rgba(255,255,255,0.9)
+      --mdc-icon-size: 20px
 
   - type: state-label
     entity: sensor.prizrak_95311_battery_voltage
     style:
-      top: 12%
-      left: 12%
-      font-size: 24px
+      top: 10%
+      left: 8%
+      font-size: 18px
       font-weight: bold
       color: white
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
     suffix: ' В'
 
+  # Engine temperature - top right (icon and value)
+  - type: icon
+    icon: mdi:engine
+    style:
+      top: 4%
+      right: 8%
+      color: rgba(255,255,255,0.9)
+      --mdc-icon-size: 20px
+
   - type: state-label
     entity: sensor.prizrak_95311_engine_temperature
     style:
-      top: 12%
-      right: 12%
-      font-size: 24px
+      top: 10%
+      right: 8%
+      font-size: 18px
       font-weight: bold
       color: white
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+    state_filter:
+      "unavailable": "--"
+      "unknown": "--"
+      "Unknown": "--"
     suffix: ' °C'
+
+  # Fuel level - bottom left
+  - type: icon
+    icon: mdi:gas-station
+    style:
+      bottom: 20%
+      left: 8%
+      color: rgba(255,255,255,0.9)
+      --mdc-icon-size: 20px
 
   - type: state-label
     entity: sensor.prizrak_95311_fuel_level
     style:
-      bottom: 12%
-      left: 12%
-      font-size: 24px
+      bottom: 14%
+      left: 8%
+      font-size: 18px
       font-weight: bold
       color: white
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
     suffix: ' л'
 
+  # Outside temperature - bottom right (value above icon)
   - type: state-label
     entity: sensor.prizrak_95311_outside_temperature
     style:
-      bottom: 12%
-      right: 12%
-      font-size: 24px
+      bottom: 20%
+      right: 8%
+      font-size: 18px
       font-weight: bold
       color: white
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+    state_filter:
+      "unavailable": "--"
+      "unknown": "--"
+      "Unknown": "--"
     suffix: ' °C'
 
+  - type: icon
+    icon: mdi:thermometer
+    style:
+      bottom: 14%
+      right: 8%
+      color: rgba(255,255,255,0.9)
+      --mdc-icon-size: 20px
+
+  # Inside temperature - center
   - type: state-label
     entity: sensor.prizrak_95311_temperature
     style:
       top: 54%
       left: 50%
-      font-size: 28px
+      font-size: 20px
       font-weight: bold
       color: white
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+    state_filter:
+      "unavailable": "--"
+      "unknown": "--"
+      "Unknown": "--"
     suffix: ' °C'
 
-  - type: icon
-    icon: mdi:car-battery
-    style:
-      top: 8%
-      left: 12%
-      color: rgba(255,255,255,0.9)
-
-  - type: icon
-    icon: mdi:engine
-    style:
-      top: 8%
-      right: 12%
-      color: rgba(255,255,255,0.9)
-
-  - type: icon
-    icon: mdi:gas-station
-    style:
-      bottom: 8%
-      left: 12%
-      color: rgba(255,255,255,0.9)
-
-  - type: icon
-    icon: mdi:thermometer
-    style:
-      bottom: 8%
-      right: 12%
-      color: rgba(255,255,255,0.9)
-
-  # Guard control buttons (bottom center)
+  # Guard button - inactive (gray) when guard is OFF
   - type: conditional
     conditions:
       - entity: sensor.prizrak_95311_guard
         state: 'SafeGuardOff'
     elements:
-      - type: state-icon
-        entity: button.prizrak_95311_guard_on
-        icon: mdi:shield-check
+      - type: icon
+        icon: mdi:shield-lock
         style:
-          bottom: 2%
-          left: 42%
-          --mdc-icon-size: 48px
-          color: rgba(100,200,100,0.9)
-          background: rgba(0,0,0,0.5)
-          border-radius: 50%
-          padding: 8px
+          bottom: 3%
+          left: 35%
+          --mdc-icon-size: 50px
+          color: rgba(150,150,150,0.8)
         tap_action:
           action: none
         hold_action:
@@ -326,24 +354,21 @@ elements:
           service_data:
             entity_id: button.prizrak_95311_guard_on
           confirmation:
-            text: "Включить охрану?"
+            text: Включить охрану?
 
+  # Guard button - active (blue) when guard is ON
   - type: conditional
     conditions:
       - entity: sensor.prizrak_95311_guard
         state_not: 'SafeGuardOff'
     elements:
-      - type: state-icon
-        entity: button.prizrak_95311_guard_off
-        icon: mdi:shield-off
+      - type: icon
+        icon: mdi:shield-lock
         style:
-          bottom: 2%
-          left: 42%
-          --mdc-icon-size: 48px
-          color: rgba(255,100,100,0.9)
-          background: rgba(0,0,0,0.5)
-          border-radius: 50%
-          padding: 8px
+          bottom: 3%
+          left: 35%
+          --mdc-icon-size: 50px
+          color: rgba(33,150,243,1)
         tap_action:
           action: none
         hold_action:
@@ -352,25 +377,21 @@ elements:
           service_data:
             entity_id: button.prizrak_95311_guard_off
           confirmation:
-            text: "Выключить охрану?"
+            text: Выключить охрану?
 
-  # Autolaunch control buttons (bottom center-right)
+  # Autolaunch button - inactive (gray) when engine is OFF
   - type: conditional
     conditions:
       - entity: sensor.prizrak_95311_ignition
         state_not: 'On'
     elements:
-      - type: state-icon
-        entity: button.prizrak_95311_autolaunch_on
+      - type: icon
         icon: mdi:engine
         style:
-          bottom: 2%
-          left: 52%
-          --mdc-icon-size: 48px
-          color: rgba(100,150,255,0.9)
-          background: rgba(0,0,0,0.5)
-          border-radius: 50%
-          padding: 8px
+          bottom: 3%
+          right: 35%
+          --mdc-icon-size: 50px
+          color: rgba(150,150,150,0.8)
         tap_action:
           action: none
         hold_action:
@@ -379,24 +400,21 @@ elements:
           service_data:
             entity_id: button.prizrak_95311_autolaunch_on
           confirmation:
-            text: "Запустить двигатель?"
+            text: Запустить двигатель?
 
+  # Autolaunch button - active (orange) when engine is ON
   - type: conditional
     conditions:
       - entity: sensor.prizrak_95311_ignition
         state: 'On'
     elements:
-      - type: state-icon
-        entity: button.prizrak_95311_autolaunch_off
-        icon: mdi:engine-off
+      - type: icon
+        icon: mdi:engine
         style:
-          bottom: 2%
-          left: 52%
-          --mdc-icon-size: 48px
-          color: rgba(255,150,100,0.9)
-          background: rgba(0,0,0,0.5)
-          border-radius: 50%
-          padding: 8px
+          bottom: 3%
+          right: 35%
+          --mdc-icon-size: 50px
+          color: rgba(255,152,0,1)
         tap_action:
           action: none
         hold_action:
@@ -405,4 +423,4 @@ elements:
           service_data:
             entity_id: button.prizrak_95311_autolaunch_off
           confirmation:
-            text: "Заглушить двигатель?"
+            text: Заглушить двигатель?

@@ -8,15 +8,16 @@
 </feMerge>
 </filter>
 </defs>
-<ellipse cx="361" cy="361" rx="180" ry="280"
-         fill="none"
-         stroke="#00D4FF"
-         stroke-width="15"
-         opacity="0.8"
-         filter="url(#glow)"/>
-<ellipse cx="361" cy="361" rx="180" ry="280"
-         fill="none"
-         stroke="#00BFFF"
-         stroke-width="8"
-         opacity="1"/>
+<!-- Rounded rectangle covering the entire car with 10px padding -->
+<rect x="161" y="61" width="400" height="600" rx="30" ry="30"
+      fill="none"
+      stroke="#00D4FF"
+      stroke-width="15"
+      opacity="0.8"
+      filter="url(#glow)"/>
+<rect x="161" y="61" width="400" height="600" rx="30" ry="30"
+      fill="none"
+      stroke="#00BFFF"
+      stroke-width="8"
+      opacity="1"/>
 </svg>
