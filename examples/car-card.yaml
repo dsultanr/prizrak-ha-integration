@@ -9,8 +9,10 @@
 #
 # FEATURES:
 # - Blue perimeter appears around car when guard is ON
+# - Orange overlay on doors/hood/trunk when open
 # - Interactive guard and autolaunch buttons with confirmation dialogs
 # - Real-time status updates for all sensors
+# - Visual indicators for ignition status
 
 type: vertical-stack
 card_mod:
@@ -114,6 +116,96 @@ cards:
             elements:
               - type: image
                 image: /local/prizrak/car-perimeter.svg
+                style:
+                  top: 0
+                  left: 0
+                  width: 100%
+                  height: 100%
+                  pointer-events: none
+
+          # Hood open (orange overlay)
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_hood
+                state: "on"
+            elements:
+              - type: image
+                image: /local/prizrak/door-hood-open.svg
+                style:
+                  top: 0
+                  left: 0
+                  width: 100%
+                  height: 100%
+                  pointer-events: none
+
+          # Trunk open (orange overlay)
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_trunk
+                state: "on"
+            elements:
+              - type: image
+                image: /local/prizrak/door-trunk-open.svg
+                style:
+                  top: 0
+                  left: 0
+                  width: 100%
+                  height: 100%
+                  pointer-events: none
+
+          # Driver door open (orange overlay)
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_driver_door
+                state: "on"
+            elements:
+              - type: image
+                image: /local/prizrak/door-fl-open.svg
+                style:
+                  top: 0
+                  left: 0
+                  width: 100%
+                  height: 100%
+                  pointer-events: none
+
+          # Front passenger door open (orange overlay)
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_front_pass_door
+                state: "on"
+            elements:
+              - type: image
+                image: /local/prizrak/door-fr-open.svg
+                style:
+                  top: 0
+                  left: 0
+                  width: 100%
+                  height: 100%
+                  pointer-events: none
+
+          # Rear left door open (orange overlay)
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_rear_left_door
+                state: "on"
+            elements:
+              - type: image
+                image: /local/prizrak/door-rl-open.svg
+                style:
+                  top: 0
+                  left: 0
+                  width: 100%
+                  height: 100%
+                  pointer-events: none
+
+          # Rear right door open (orange overlay)
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_rear_right_door
+                state: "on"
+            elements:
+              - type: image
+                image: /local/prizrak/door-rr-open.svg
                 style:
                   top: 0
                   left: 0
