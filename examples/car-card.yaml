@@ -3,6 +3,12 @@
 # Replace 95311 with your device ID
 
 type: vertical-stack
+card_mod:
+  style: |
+    ha-card {
+      max-width: 400px;
+      margin: 0 auto;
+    }
 cards:
   # Row 1: Temperatures (3 blocks)
   - type: horizontal-stack
@@ -72,7 +78,7 @@ cards:
                   border-bottom: 1px solid #747b97;
                 }
 
-      # Center: SVG Car
+      # Center: SVG Car (120x180px)
       - type: picture-elements
         image: /local/prizrak/car-full.svg
         card_mod:
@@ -81,6 +87,13 @@ cards:
               background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
               border-left: 1px solid #747b97;
               border-right: 1px solid #747b97;
+              width: 120px !important;
+              height: 180px !important;
+              flex-shrink: 0;
+            }
+            #root {
+              width: 120px !important;
+              height: 180px !important;
             }
         elements:
           # Guard status overlay
