@@ -1,6 +1,16 @@
 # Prizrak Monitoring - Control Panel Card
 # Точная копия control-info__surface из monitoring.tecel.ru
-# Replace 95311 with your device ID
+#
+# REQUIREMENTS:
+# 1. Install card-mod via HACS (Frontend) - для стилизации
+# 2. Install custom:button-card via HACS (Frontend) - для интерактивных кнопок
+# 3. SVG files will be automatically copied to /config/www/prizrak/ by the integration
+# 4. Replace 95311 with your device ID throughout this file
+#
+# FEATURES:
+# - Blue perimeter appears around car when guard is ON
+# - Interactive guard and autolaunch buttons with confirmation dialogs
+# - Real-time status updates for all sensors
 
 type: vertical-stack
 card_mod:
@@ -96,7 +106,22 @@ cards:
               height: 180px !important;
             }
         elements:
-          # Guard status overlay
+          # Guard perimeter (blue outline when guard is on)
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_guard
+                state: "on"
+            elements:
+              - type: image
+                image: /local/prizrak/car-perimeter.svg
+                style:
+                  top: 0
+                  left: 0
+                  width: 100%
+                  height: 100%
+                  pointer-events: none
+
+          # Guard status overlay (icon)
           - type: conditional
             conditions:
               - entity: binary_sensor.prizrak_95311_guard
