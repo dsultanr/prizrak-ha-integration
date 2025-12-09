@@ -1,238 +1,194 @@
-# Prizrak Monitoring - Car Control Panel Card
-# Based on monitoring.tecel.ru control panel design
+# Prizrak Monitoring - Control Panel Card
+# Точная копия control-info__surface из monitoring.tecel.ru
 # Replace 95311 with your device ID
 
-type: picture-elements
-image: /local/prizrak/car-full.svg
-elements:
-  # Dynamic SVG state changes via card-mod
-  - type: custom:mod-card
-    card_mod:
-      style:
-        .: |
-          :host {
-            display: block;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-          }
-        ha-card: |
-          background: none !important;
-          box-shadow: none !important;
-          border: none !important;
-    card:
-      type: markdown
-      content: |
-        <style>
-        /* Guard mode - blue perimeter glow */
-        {% if is_state('binary_sensor.prizrak_95311_guard', 'on') %}
-          .car-perimetr {
-            stroke: #00c0fc !important;
-            stroke-width: 2 !important;
-            opacity: 0.8 !important;
-          }
-        {% endif %}
+type: vertical-stack
+cards:
+  # Row 1: Temperatures (3 blocks)
+  - type: horizontal-stack
+    cards:
+      - type: tile
+        entity: sensor.prizrak_95311_outside_temperature
+        name: На улице
+        icon: mdi:thermometer
+        vertical: true
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+              border-bottom: 1px solid #747b97;
+            }
+      - type: tile
+        entity: sensor.prizrak_95311_engine_temperature
+        name: Двигатель
+        icon: mdi:engine
+        vertical: true
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+              border-left: 1px solid #747b97;
+              border-right: 1px solid #747b97;
+              border-bottom: 1px solid #747b97;
+            }
+      - type: tile
+        entity: sensor.prizrak_95311_temperature
+        name: В салоне
+        icon: mdi:home-thermometer
+        vertical: true
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+              border-bottom: 1px solid #747b97;
+            }
 
-        /* Autolaunch mode - white perimeter + lights */
-        {% if is_state('binary_sensor.prizrak_95311_ignition', 'on') %}
-          .car-perimetr {
-            stroke: #ffffff !important;
-            stroke-width: 3 !important;
-            opacity: 1 !important;
-          }
-          .car-lamps {
-            fill: #ffeb3b !important;
-            fill-opacity: 0.9 !important;
-          }
-          #lights_stop_l, #lights_stop_r {
-            fill: #ff0000 !important;
-          }
-        {% endif %}
+  # Row 2: Left column (Voltage+RPM), Center (SVG Car), Right column (Fuel+Speed)
+  - type: horizontal-stack
+    cards:
+      # Left column: Voltage and RPM stacked
+      - type: vertical-stack
+        cards:
+          - type: tile
+            entity: sensor.prizrak_95311_battery_voltage
+            name: Напряжение
+            icon: mdi:car-battery
+            vertical: false
+            card_mod:
+              style: |
+                ha-card {
+                  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+                  border-bottom: 1px solid #747b97;
+                }
+          - type: tile
+            entity: sensor.prizrak_95311_rpm
+            name: Обороты
+            icon: mdi:engine
+            vertical: false
+            card_mod:
+              style: |
+                ha-card {
+                  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+                  border-bottom: 1px solid #747b97;
+                }
 
-        /* Open doors/hood/trunk - orange highlight */
-        {% if is_state('binary_sensor.prizrak_95311_hood', 'on') %}
-          #hood { fill: #ff9800; fill-opacity: 0.7; }
-        {% endif %}
-        {% if is_state('binary_sensor.prizrak_95311_trunk', 'on') %}
-          #trunk { fill: #ff9800; fill-opacity: 0.7; }
-        {% endif %}
-        {% if is_state('binary_sensor.prizrak_95311_driver_door', 'on') %}
-          #door_fl { fill: #ff9800; fill-opacity: 0.7; }
-        {% endif %}
-        {% if is_state('binary_sensor.prizrak_95311_front_pass_door', 'on') %}
-          #door_fr { fill: #ff9800; fill-opacity: 0.7; }
-        {% endif %}
-        {% if is_state('binary_sensor.prizrak_95311_rear_left_door', 'on') %}
-          #door_rl { fill: #ff9800; fill-opacity: 0.7; }
-        {% endif %}
-        {% if is_state('binary_sensor.prizrak_95311_rear_right_door', 'on') %}
-          #door_rr { fill: #ff9800; fill-opacity: 0.7; }
-        {% endif %}
-        </style>
+      # Center: SVG Car
+      - type: picture-elements
+        image: /local/prizrak/car-full.svg
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+              border-left: 1px solid #747b97;
+              border-right: 1px solid #747b97;
+            }
+        elements:
+          # Guard status overlay
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_guard
+                state: "on"
+            elements:
+              - type: icon
+                icon: mdi:shield-check
+                style:
+                  top: 10%
+                  left: 50%
+                  color: "#00c0fc"
+                  --mdc-icon-size: 30px
+                  opacity: 0.8
 
-  # Top status bar - Balance and icons
-  - type: state-label
-    entity: sensor.prizrak_95311_sim_balance
-    prefix: "Баланс: "
-    suffix: " ₽"
-    style:
-      top: 2%
-      left: 10%
-      color: white
-      background: rgba(255,255,255,0.1)
-      padding: 5px 10px
-      border-radius: 5px
-      font-size: 12px
-      font-weight: bold
+          # Ignition status overlay
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.prizrak_95311_ignition
+                state: "on"
+            elements:
+              - type: icon
+                icon: mdi:engine
+                style:
+                  top: 10%
+                  left: 50%
+                  color: "#ffffff"
+                  --mdc-icon-size: 30px
+                  opacity: 1
 
-  - type: conditional
-    conditions:
-      - entity: binary_sensor.prizrak_95311_gps
-        state: "on"
-    elements:
-      - type: icon
-        icon: mdi:radar
-        style:
-          top: 2%
-          right: 15%
-          color: "#00c0fc"
-          --mdc-icon-size: 20px
+          # Temperature in center
+          - type: state-label
+            entity: sensor.prizrak_95311_temperature
+            suffix: "°C"
+            style:
+              top: 50%
+              left: 50%
+              color: white
+              font-size: 18px
+              font-weight: bold
+              text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
 
-  - type: conditional
-    conditions:
-      - entity: binary_sensor.prizrak_95311_parking_brake
-        state: "on"
-    elements:
-      - type: icon
-        icon: mdi:car-brake-parking
-        style:
-          top: 2%
-          right: 10%
-          color: "#ff9800"
-          --mdc-icon-size: 20px
+      # Right column: Fuel and Speed stacked
+      - type: vertical-stack
+        cards:
+          - type: tile
+            entity: sensor.prizrak_95311_fuel_level
+            name: Топливо
+            icon: mdi:gas-station
+            vertical: false
+            card_mod:
+              style: |
+                ha-card {
+                  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+                  border-bottom: 1px solid #747b97;
+                }
+          - type: tile
+            entity: sensor.prizrak_95311_speed
+            name: Скорость
+            icon: mdi:speedometer
+            vertical: false
+            card_mod:
+              style: |
+                ha-card {
+                  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+                  border-bottom: 1px solid #747b97;
+                }
 
-  # Temperature row - top
-  - type: state-label
-    entity: sensor.prizrak_95311_outside_temperature
-    prefix: "На улице\n"
-    suffix: "°C"
-    style:
-      top: 20%
-      left: 12%
-      color: white
-      font-size: 11px
-      text-align: center
-      line-height: 1.4
+  # Row 3: Odometer, Guard Status, Autolaunch status (3 blocks)
+  - type: horizontal-stack
+    cards:
+      - type: tile
+        entity: sensor.prizrak_95311_odometer
+        name: Пробег
+        icon: mdi:counter
+        vertical: true
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            }
 
-  - type: state-label
-    entity: sensor.prizrak_95311_engine_temperature
-    prefix: "Двигатель\n"
-    suffix: "°C"
-    style:
-      top: 20%
-      left: 50%
-      color: white
-      font-size: 11px
-      text-align: center
-      line-height: 1.4
+      - type: tile
+        entity: binary_sensor.prizrak_95311_guard
+        name: Охрана
+        icon: mdi:shield-check
+        vertical: true
+        tap_action:
+          action: more-info
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+              border-left: 1px solid #747b97;
+              border-right: 1px solid #747b97;
+            }
 
-  - type: state-label
-    entity: sensor.prizrak_95311_temperature
-    prefix: "В салоне\n"
-    suffix: "°C"
-    style:
-      top: 20%
-      left: 88%
-      color: white
-      font-size: 11px
-      text-align: center
-      line-height: 1.4
-
-  # Bottom telemetry row
-  - type: state-label
-    entity: sensor.prizrak_95311_battery_voltage
-    prefix: "Батарея\n"
-    suffix: " В"
-    style:
-      bottom: 20%
-      left: 10%
-      color: white
-      font-size: 11px
-      text-align: center
-      line-height: 1.4
-
-  - type: state-label
-    entity: sensor.prizrak_95311_rpm
-    prefix: "RPM\n"
-    style:
-      bottom: 20%
-      left: 30%
-      color: white
-      font-size: 11px
-      text-align: center
-      line-height: 1.4
-
-  # Guard status - center bottom
-  - type: state-label
-    entity: binary_sensor.prizrak_95311_guard
-    style:
-      bottom: 25%
-      left: 50%
-      color: white
-      font-size: 14px
-      font-weight: bold
-      text-align: center
-    attribute: null
-    tap_action:
-      action: more-info
-
-  - type: state-label
-    entity: sensor.prizrak_95311_fuel_level
-    prefix: "Топливо\n"
-    suffix: " л"
-    style:
-      bottom: 20%
-      right: 30%
-      color: white
-      font-size: 11px
-      text-align: center
-      line-height: 1.4
-
-  - type: state-label
-    entity: sensor.prizrak_95311_speed
-    prefix: "Скорость\n"
-    suffix: " км/ч"
-    style:
-      bottom: 20%
-      right: 10%
-      color: white
-      font-size: 11px
-      text-align: center
-      line-height: 1.4
-
-  # Odometer - bottom center
-  - type: state-label
-    entity: sensor.prizrak_95311_odometer
-    prefix: "Пробег: "
-    suffix: " км"
-    style:
-      bottom: 5%
-      left: 50%
-      color: white
-      font-size: 11px
-      text-align: center
-
-  # Temperature in car center (large)
-  - type: state-label
-    entity: sensor.prizrak_95311_temperature
-    suffix: "°C"
-    style:
-      top: 52%
-      left: 50%
-      color: white
-      font-size: 20px
-      font-weight: bold
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
+      - type: tile
+        entity: binary_sensor.prizrak_95311_ignition
+        name: Автозапуск
+        icon: mdi:engine
+        vertical: true
+        tap_action:
+          action: more-info
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            }
