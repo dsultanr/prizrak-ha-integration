@@ -178,30 +178,62 @@ cards:
               background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             }
 
-      - type: tile
+      - type: custom:button-card
         entity: binary_sensor.prizrak_95311_guard
         name: Охрана
         icon: mdi:shield-check
-        vertical: true
+        show_state: true
+        show_label: false
         tap_action:
-          action: more-info
-        card_mod:
-          style: |
-            ha-card {
-              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-              border-left: 1px solid #747b97;
-              border-right: 1px solid #747b97;
-            }
+          action: call-service
+          service: button.press
+          service_data:
+            entity_id: >
+              [[[ return entity.state === 'on' ? 'button.prizrak_95311_guard_off' : 'button.prizrak_95311_guard_on'; ]]]
+          confirmation:
+            text: >
+              [[[ return entity.state === 'on' ? 'Выключить охрану?' : 'Включить охрану?'; ]]]
+        styles:
+          card:
+            - background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%)
+            - border-left: 1px solid #747b97
+            - border-right: 1px solid #747b97
+          icon:
+            - color: >
+                [[[ return entity.state === 'on' ? '#00c0fc' : '#95a5a6'; ]]]
+          name:
+            - font-size: 12px
+            - color: white
+          state:
+            - font-size: 14px
+            - font-weight: bold
+            - color: white
 
-      - type: tile
+      - type: custom:button-card
         entity: binary_sensor.prizrak_95311_ignition
         name: Автозапуск
         icon: mdi:engine
-        vertical: true
+        show_state: true
+        show_label: false
         tap_action:
-          action: more-info
-        card_mod:
-          style: |
-            ha-card {
-              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            }
+          action: call-service
+          service: button.press
+          service_data:
+            entity_id: >
+              [[[ return entity.state === 'on' ? 'button.prizrak_95311_autolaunch_off' : 'button.prizrak_95311_autolaunch_on'; ]]]
+          confirmation:
+            text: >
+              [[[ return entity.state === 'on' ? 'Выключить автозапуск?' : 'Включить автозапуск?'; ]]]
+        styles:
+          card:
+            - background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%)
+          icon:
+            - color: >
+                [[[ return entity.state === 'on' ? '#ffffff' : '#95a5a6'; ]]]
+          name:
+            - font-size: 12px
+            - color: white
+          state:
+            - font-size: 14px
+            - font-weight: bold
+            - color: white
