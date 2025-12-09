@@ -50,7 +50,9 @@ class PrizrakClient:
         self.last_auth_time = 0
         self.auth_validity_hours = 12
         self.last_message_time = 0
+        self.last_event_time = 0
         self.message_timeout = 60
+        self.event_timeout = 120  # Если нет EventObject 2 минуты - переподключение
         self.ping_interval = 15
         self.last_ping_time = 0
 
@@ -302,6 +304,9 @@ class PrizrakClient:
         if not arguments:
             return
 
+        # Update timestamp of last EventObject
+        self.last_event_time = time.time()
+
         event_data = arguments[0]
         device_id = event_data.get('device_id')
         device_state = event_data.get('device_state', {})
@@ -420,19 +425,34 @@ class PrizrakClient:
         while self.running:
             await asyncio.sleep(10)
 
-            if self.websocket and self.last_message_time > 0:
-                time_since_last_msg = time.time() - self.last_message_time
+            if self.websocket:
+                # Check for any messages (including ping/pong)
+                if self.last_message_time > 0:
+                    time_since_last_msg = time.time() - self.last_message_time
 
-                if time_since_last_msg > self.message_timeout:
-                    _LOGGER.warning(f"No messages for {int(time_since_last_msg)}s - connection may be dead")
-                    _LOGGER.info("Initiating reconnection...")
+                    if time_since_last_msg > self.message_timeout:
+                        _LOGGER.warning(f"No messages for {int(time_since_last_msg)}s - connection may be dead")
+                        _LOGGER.info("Initiating reconnection...")
 
-                    if self.websocket:
                         try:
                             await self.websocket.close()
                         except:
                             pass
-                    break
+                        break
+
+                # Check for EventObject specifically (device state updates)
+                if self.last_event_time > 0:
+                    time_since_last_event = time.time() - self.last_event_time
+
+                    if time_since_last_event > self.event_timeout:
+                        _LOGGER.warning(f"No EventObject updates for {int(time_since_last_event)}s - watch may be broken")
+                        _LOGGER.info("Initiating reconnection to re-subscribe...")
+
+                        try:
+                            await self.websocket.close()
+                        except:
+                            pass
+                        break
 
     async def run(self):
         """Main run loop with auto-recovery."""

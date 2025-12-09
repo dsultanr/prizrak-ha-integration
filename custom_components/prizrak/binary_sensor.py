@@ -89,11 +89,48 @@ class PrizrakBinarySensor(CoordinatorEntity, BinarySensorEntity):
     def is_on(self) -> bool:
         """Return true if the binary sensor is on."""
         device_state = self.coordinator.devices.get(self._device_id, {})
-        value = device_state.get(self._state_key)
 
-        # For doors/locks: "Open" = ON (open), anything else = OFF (closed)
+        # Handle nested keys (e.g., "geo.gps_state")
+        if '.' in self._state_key:
+            keys = self._state_key.split('.')
+            value = device_state
+            for key in keys:
+                if isinstance(value, dict):
+                    value = value.get(key)
+                else:
+                    value = None
+                    break
+        else:
+            value = device_state.get(self._state_key)
+
+        # Doors/locks: "Open" = ON (open)
         if value == "Open":
             return True
+
+        # Connection: Connected = ON, Disconnected = OFF
+        if self._state_key == "connection_state":
+            return value == "Connected"
+
+        # Guard: any state except SafeGuardOff = ON
+        if self._state_key == "guard":
+            return value not in ["SafeGuardOff", "Unknown", None, ""]
+
+        # Alarm: anything except "Off" = ON
+        if self._state_key == "alarm":
+            return value not in ["Off", "Unknown", None, ""]
+
+        # GPS: "Actual" = ON
+        if self._state_key == "geo.gps_state":
+            return value == "Actual"
+
+        # Ignition: any state except engine off states = ON
+        if self._state_key == "ignition_switch":
+            return value not in ["EngineOffNoKey", "EngineOff", "Unknown", None, ""]
+
+        # Parking brake: "On" = problem (ON)
+        if self._state_key == "parking_brake":
+            return value == "On"
+
         return False
 
     @property

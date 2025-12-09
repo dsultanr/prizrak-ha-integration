@@ -35,19 +35,23 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
 
         Args:
             device_id: Device ID
-            device_state: New device state
+            device_state: New device state (partial update)
         """
-        if device_id not in self.devices:
-            self.devices[device_id] = {}
+        # Use client.device_states which accumulates ALL fields
+        # instead of coordinator.devices which only gets partial updates
+        full_device_state = self.client.device_states.get(device_id, {})
 
-        # Merge new state with existing
-        self.devices[device_id].update(device_state)
+        if full_device_state:
+            # Add timestamp of last update (as datetime object for TIMESTAMP device_class)
+            full_device_state["last_update"] = dt_util.utcnow()
 
-        # Add timestamp of last update (as datetime object for TIMESTAMP device_class)
-        self.devices[device_id]["last_update"] = dt_util.utcnow()
+            # Update coordinator's cache
+            self.devices[device_id] = full_device_state
 
-        # Notify all listeners (entities) about the update
-        self.async_set_updated_data(self.devices)
+            # Notify all listeners (entities) about the update
+            self.async_set_updated_data(self.devices)
+        else:
+            _LOGGER.warning(f"Device {device_id} not found in client.device_states")
 
     async def _async_update_data(self) -> dict[int, dict[str, Any]]:
         """Update data via library.

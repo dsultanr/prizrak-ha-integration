@@ -11,15 +11,11 @@ PLATFORMS = ["sensor", "binary_sensor", "button"]
 # Sensor definitions: (name, unit, device_class, icon, state_key)
 SENSOR_TYPES = {
     "serial_no": ("Serial Number", None, None, "mdi:identifier", "serial_no"),
-    "connection": ("Connection", None, None, "mdi:connection", "connection_state"),
-    "guard": ("Guard Status", None, None, "mdi:shield-check", "guard"),
-    "alarm": ("Alarm Status", None, None, "mdi:alarm-light", "alarm"),
     "last_update": ("Last Update", None, SensorDeviceClass.TIMESTAMP, "mdi:clock-outline", "last_update"),
 
     # GPS
     "latitude": ("Latitude", "°", None, "mdi:map-marker", "geo.lat"),
     "longitude": ("Longitude", "°", None, "mdi:map-marker", "geo.lon"),
-    "gps_state": ("GPS State", None, None, "mdi:crosshairs-gps", "geo.gps_state"),
     "gnss_speed": ("GNSS Speed", "km/h", SensorDeviceClass.SPEED, "mdi:speedometer", "geo_ext.gnss_speed"),
     "altitude": ("Altitude", "m", SensorDeviceClass.DISTANCE, "mdi:altimeter", "geo_ext.gnss_height"),
     "satellites": ("Satellites", None, None, "mdi:satellite-variant", "geo_ext.gnss_sat_used"),
@@ -35,9 +31,7 @@ SENSOR_TYPES = {
     "rpm": ("Engine RPM", "RPM", None, "mdi:engine", "rpm"),
     "odometer": ("Odometer", "km", SensorDeviceClass.DISTANCE, "mdi:counter", "route"),
 
-    # Engine & Systems
-    "ignition": ("Ignition", None, None, "mdi:key", "ignition_switch"),
-    "parking_brake": ("Parking Brake", None, None, "mdi:car-brake-parking", "parking_brake"),
+    # Engine & Systems (ignition and parking_brake moved to binary_sensor)
 
     # GSM
     "gsm_level": ("GSM Signal", "%", None, "mdi:signal", "gsm_level"),
@@ -57,6 +51,7 @@ SENSOR_TYPES = {
 
 # Binary sensor definitions: (name, device_class, state_key)
 BINARY_SENSOR_TYPES = {
+    # Doors & Locks
     "driver_door": ("Driver Door", BinarySensorDeviceClass.DOOR, "driver_door"),
     "front_pass_door": ("Passenger Door", BinarySensorDeviceClass.DOOR, "front_pass_door"),
     "rear_left_door": ("Rear Left Door", BinarySensorDeviceClass.DOOR, "rear_left_door"),
@@ -64,6 +59,18 @@ BINARY_SENSOR_TYPES = {
     "trunk": ("Trunk", BinarySensorDeviceClass.DOOR, "trunk"),
     "hood": ("Hood", BinarySensorDeviceClass.DOOR, "hood"),
     "central_lock": ("Central Lock", BinarySensorDeviceClass.LOCK, "central_lock"),
+
+    # Security & Safety
+    "connection": ("Connection", BinarySensorDeviceClass.CONNECTIVITY, "connection_state"),
+    "guard": ("Guard", None, "guard"),
+    "alarm": ("Alarm", BinarySensorDeviceClass.SAFETY, "alarm"),
+
+    # Engine & Systems
+    "ignition": ("Ignition", BinarySensorDeviceClass.RUNNING, "ignition_switch"),
+    "parking_brake": ("Parking Brake", BinarySensorDeviceClass.PROBLEM, "parking_brake"),
+
+    # GPS
+    "gps": ("GPS", None, "geo.gps_state"),
 }
 
 # Button definitions: (name, command, icon)

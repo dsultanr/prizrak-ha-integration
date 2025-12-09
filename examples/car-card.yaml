@@ -5,8 +5,8 @@ elements:
   # Autolaunch mode (ignition on) - white outline with lights
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_ignition
-        state: 'On'
+      - entity: binary_binary_sensor.prizrak_95311_ignition
+        state: 'on'
     elements:
       - type: image
         image: /local/prizrak/car-autolaunch.svg
@@ -26,10 +26,10 @@ elements:
   # Guard mode (when not in autolaunch) - blue rounded rectangle glow
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_guard
-        state_not: 'SafeGuardOff'
-      - entity: sensor.prizrak_95311_ignition
-        state_not: 'On'
+      - entity: binary_sensor.prizrak_95311_guard
+        state: 'on'
+      - entity: binary_sensor.prizrak_95311_ignition
+        state: 'off'
     elements:
       - type: image
         image: /local/prizrak/car-guard-glow.svg
@@ -168,8 +168,8 @@ elements:
   # Lock icon (when guard is on)
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_guard
-        state_not: 'SafeGuardOff'
+      - entity: binary_sensor.prizrak_95311_guard
+        state: 'on'
     elements:
       - type: image
         image: /local/prizrak/lock-closed.svg
@@ -182,8 +182,8 @@ elements:
   # Speed display (shown when ignition is on)
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_ignition
-        state: 'On'
+      - entity: binary_sensor.prizrak_95311_ignition
+        state: 'on'
     elements:
       - type: state-label
         entity: sensor.prizrak_95311_speed
@@ -205,8 +205,8 @@ elements:
   # RPM display (shown when ignition is on)
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_ignition
-        state: 'On'
+      - entity: binary_sensor.prizrak_95311_ignition
+        state: 'on'
     elements:
       - type: state-label
         entity: sensor.prizrak_95311_rpm
@@ -345,8 +345,8 @@ elements:
   # Guard button - inactive (gray) when guard is OFF
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_guard
-        state: 'SafeGuardOff'
+      - entity: binary_sensor.prizrak_95311_guard
+        state: 'off'
     elements:
       - type: icon
         icon: mdi:shield-lock
@@ -368,8 +368,8 @@ elements:
   # Guard button - active (blue) when guard is ON
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_guard
-        state_not: 'SafeGuardOff'
+      - entity: binary_sensor.prizrak_95311_guard
+        state: 'on'
     elements:
       - type: icon
         icon: mdi:shield-lock
@@ -391,8 +391,8 @@ elements:
   # Autolaunch button - inactive (gray) when engine is OFF
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_ignition
-        state_not: 'On'
+      - entity: binary_sensor.prizrak_95311_ignition
+        state: 'off'
     elements:
       - type: icon
         icon: mdi:engine
@@ -414,8 +414,8 @@ elements:
   # Autolaunch button - active (orange) when engine is ON
   - type: conditional
     conditions:
-      - entity: sensor.prizrak_95311_ignition
-        state: 'On'
+      - entity: binary_sensor.prizrak_95311_ignition
+        state: 'on'
     elements:
       - type: icon
         icon: mdi:engine
