@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.exceptions import HomeAssistantError
 
 from .const import DOMAIN, BUTTON_TYPES
 from .coordinator import PrizrakDataUpdateCoordinator
@@ -88,13 +89,38 @@ class PrizrakButton(CoordinatorEntity, ButtonEntity):
         """Handle the button press."""
         _LOGGER.info(f"Button pressed: {self._command} for device {self._device_id}")
 
-        # Send command via client
-        success = await self.coordinator.client.send_command(self._device_id, self._command)
+        # Check if coordinator is available
+        if not self.coordinator.client.websocket:
+            _LOGGER.error(f"Cannot send command {self._command}: WebSocket not connected")
+            raise HomeAssistantError(
+                f"Cannot execute command: Not connected to Prizrak server. "
+                f"Please check your internet connection and try again."
+            )
 
-        if success:
-            _LOGGER.info(f"Command {self._command} sent successfully to device {self._device_id}")
-        else:
-            _LOGGER.error(f"Failed to send command {self._command} to device {self._device_id}")
+        # Send command via client with timeout
+        try:
+            success = await self.coordinator.client.send_command(
+                self._device_id,
+                self._command,
+                timeout=10.0
+            )
+
+            if success:
+                _LOGGER.info(f"Command {self._command} executed successfully on device {self._device_id}")
+            else:
+                _LOGGER.error(f"Command {self._command} failed on device {self._device_id}")
+                raise HomeAssistantError(
+                    f"Command failed: Server rejected the command or device is offline. "
+                    f"Please check device status and try again."
+                )
+
+        except Exception as e:
+            _LOGGER.error(f"Error executing command {self._command}: {e}")
+            if isinstance(e, HomeAssistantError):
+                raise
+            raise HomeAssistantError(
+                f"Command execution error: {str(e)}"
+            )
 
     @property
     def available(self) -> bool:

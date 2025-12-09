@@ -59,6 +59,9 @@ class PrizrakClient:
         # Event to signal when devices are ready
         self.devices_ready = asyncio.Event()
 
+        # Track pending command invocations
+        self.pending_invocations: Dict[str, asyncio.Future] = {}
+
     def _get_fingerprint_token(self) -> str:
         """Generate fingerprint token for vtoken."""
         data = {
@@ -223,7 +226,22 @@ class PrizrakClient:
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self._negotiate_connection_sync)
 
+    def _cleanup_pending_invocations(self):
+        """Cancel all pending invocations (called on disconnect/reconnect)."""
+        if self.pending_invocations:
+            _LOGGER.warning(f"Cleaning up {len(self.pending_invocations)} pending invocations")
+            for invocation_id, future in self.pending_invocations.items():
+                if not future.done():
+                    future.set_result({
+                        "success": False,
+                        "error": "Connection lost"
+                    })
+            self.pending_invocations.clear()
+
     async def connect_websocket(self) -> bool:
+        # Cleanup any pending commands from previous connection
+        self._cleanup_pending_invocations()
+
         if not self.connection_id:
             self.connection_id = await self.negotiate_connection()
             if not self.connection_id:
@@ -277,27 +295,64 @@ class PrizrakClient:
         await self.websocket.send(json.dumps(request, ensure_ascii=False) + '\x1e')
         _LOGGER.info(f"Subscribed to devices: {device_ids}")
 
-    async def send_command(self, device_id: int, command: str):
-        """Send command to device via WebSocket."""
+    async def send_command(self, device_id: int, command: str, timeout: float = 10.0):
+        """Send command to device via WebSocket and wait for response.
+
+        Args:
+            device_id: Device ID to send command to
+            command: Command name (GuardOn, GuardOff, AutolaunchOn, AutolaunchOff)
+            timeout: Maximum time to wait for response (default 10s)
+
+        Returns:
+            True if command was sent and server confirmed success
+            False if command failed or timed out
+        """
         if not self.websocket:
             _LOGGER.error("WebSocket not connected")
             return False
 
         self.invocation_counter += 1
+        invocation_id = str(self.invocation_counter)
+
         request = {
             "type": 1,
-            "invocationId": str(self.invocation_counter),
+            "invocationId": invocation_id,
             "target": command,
             "arguments": [{"device_id": device_id}]
         }
 
+        # Create Future for waiting response
+        future = asyncio.Future()
+        self.pending_invocations[invocation_id] = future
+
         try:
-            await self.websocket.send(json.dumps(request, ensure_ascii=False) + '\x1e')
-            _LOGGER.info(f"Sent command {command} to device {device_id}")
-            return True
-        except Exception as e:
-            _LOGGER.error(f"Failed to send command: {e}")
+            # Send command with timeout
+            await asyncio.wait_for(
+                self.websocket.send(json.dumps(request, ensure_ascii=False) + '\x1e'),
+                timeout=5.0
+            )
+            _LOGGER.info(f"Sent command {command} to device {device_id} (invocationId={invocation_id})")
+
+            # Wait for server response
+            result = await asyncio.wait_for(future, timeout=timeout)
+
+            if result.get("success", False):
+                _LOGGER.info(f"Command {command} confirmed successful by server (invocationId={invocation_id})")
+                return True
+            else:
+                error_msg = result.get("error", "Unknown error")
+                _LOGGER.error(f"Command {command} failed: {error_msg} (invocationId={invocation_id})")
+                return False
+
+        except asyncio.TimeoutError:
+            _LOGGER.error(f"Command {command} timeout - no response from server (invocationId={invocation_id})")
             return False
+        except Exception as e:
+            _LOGGER.error(f"Failed to send command {command}: {e} (invocationId={invocation_id})")
+            return False
+        finally:
+            # Cleanup pending invocation
+            self.pending_invocations.pop(invocation_id, None)
 
     def handle_event_object(self, arguments):
         """Handle EventObject - device state updates."""
@@ -373,11 +428,31 @@ class PrizrakClient:
                             _LOGGER.debug(f"Invocation: {target}")
 
                     elif msg_type == 3:
+                        # Type 3 = Completion (response to invocation)
                         invocation_id = data.get('invocationId')
                         result = data.get('result')
+                        error = data.get('error')
 
-                        _LOGGER.debug(f"Response to invocation {invocation_id}")
+                        _LOGGER.debug(f"Response to invocation {invocation_id}: error={error}")
 
+                        # Check if this is a pending command waiting for response
+                        if invocation_id in self.pending_invocations:
+                            future = self.pending_invocations[invocation_id]
+                            if not future.done():
+                                if error:
+                                    # Server returned error
+                                    future.set_result({
+                                        "success": False,
+                                        "error": error
+                                    })
+                                else:
+                                    # Command successful
+                                    future.set_result({
+                                        "success": True,
+                                        "result": result
+                                    })
+
+                        # Handle GetDevices response
                         if result and isinstance(result, dict):
                             devices_data = result.get('data', {}).get('devices', [])
                             if devices_data:
