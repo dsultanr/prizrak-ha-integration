@@ -29,36 +29,25 @@ cards:
         entity: sensor.prizrak_95311_outside_temperature
         name: На улице
         icon: mdi:thermometer
-        vertical: true
         card_mod:
           style: |
             ha-card {
-              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-              border-bottom: 1px solid #747b97;
             }
       - type: tile
         entity: sensor.prizrak_95311_engine_temperature
         name: Двигатель
         icon: mdi:engine
-        vertical: true
         card_mod:
           style: |
             ha-card {
-              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-              border-left: 1px solid #747b97;
-              border-right: 1px solid #747b97;
-              border-bottom: 1px solid #747b97;
             }
       - type: tile
-        entity: sensor.prizrak_95311_temperature
-        name: В салоне
-        icon: mdi:home-thermometer
-        vertical: true
+        entity: sensor.prizrak_95311_last_update
+        name: Соединение
+        icon: mdi:connection
         card_mod:
           style: |
             ha-card {
-              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-              border-bottom: 1px solid #747b97;
             }
 
   # Row 2: Left column (Voltage+RPM), Center (SVG Car), Right column (Fuel+Speed)
@@ -75,8 +64,6 @@ cards:
             card_mod:
               style: |
                 ha-card {
-                  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-                  border-bottom: 1px solid #747b97;
                 }
           - type: tile
             entity: sensor.prizrak_95311_rpm
@@ -86,8 +73,24 @@ cards:
             card_mod:
               style: |
                 ha-card {
-                  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-                  border-bottom: 1px solid #747b97;
+                }
+          - type: tile
+            entity: sensor.prizrak_95311_gsm_level
+            name: GSM
+            icon: mdi:signal
+            vertical: false
+            card_mod:
+              style: |
+                ha-card {
+                }
+          - type: tile
+            entity: sensor.prizrak_95311_satellites
+            name: GPS
+            icon: mdi:satellite-variant
+            vertical: false
+            card_mod:
+              style: |
+                ha-card {
                 }
 
       # Center: SVG Car (120x180px)
@@ -96,16 +99,13 @@ cards:
         card_mod:
           style: |
             ha-card {
-              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-              border-left: 1px solid #747b97;
-              border-right: 1px solid #747b97;
-              width: 120px !important;
-              height: 180px !important;
+              # width: 120px !important;
+              # height: 180px !important;
               flex-shrink: 0;
             }
             #root {
-              width: 120px !important;
-              height: 180px !important;
+              # width: 120px !important;
+              # height: 180px !important;
             }
         elements:
           # Guard perimeter (blue outline when guard is on)
@@ -266,8 +266,6 @@ cards:
             card_mod:
               style: |
                 ha-card {
-                  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-                  border-bottom: 1px solid #747b97;
                 }
           - type: tile
             entity: sensor.prizrak_95311_speed
@@ -277,24 +275,29 @@ cards:
             card_mod:
               style: |
                 ha-card {
-                  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-                  border-bottom: 1px solid #747b97;
                 }
+          - type: tile
+            entity: sensor.prizrak_95311_odometer
+            name: Пробег
+            icon: mdi:counter
+            card_mod:
+              style: |
+                ha-card {
+                }
+          - type: tile
+            entity: binary_sensor.prizrak_95311_ignition
+            name: Зажигание
+            icon: mdi:flash
+            vertical: false
+            card_mod:
+              style: |
+                ha-card {
+                }
+
 
   # Row 3: Odometer, Guard Status, Autolaunch status (3 blocks)
   - type: horizontal-stack
     cards:
-      - type: tile
-        entity: sensor.prizrak_95311_odometer
-        name: Пробег
-        icon: mdi:counter
-        vertical: true
-        card_mod:
-          style: |
-            ha-card {
-              background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            }
-
       - type: custom:button-card
         entity: binary_sensor.prizrak_95311_guard
         name: Охрана
@@ -312,9 +315,6 @@ cards:
               [[[ return entity.state === 'on' ? 'Выключить охрану?' : 'Включить охрану?'; ]]]
         styles:
           card:
-            - background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%)
-            - border-left: 1px solid #747b97
-            - border-right: 1px solid #747b97
           icon:
             - color: >
                 [[[ return entity.state === 'on' ? '#00c0fc' : '#95a5a6'; ]]]
