@@ -270,6 +270,10 @@ class PrizrakClient:
                 _LOGGER.warning(f"WebSocket rejected (HTTP 401) - authentication failed. Forcing re-login...")
                 self.auth_token = None
                 self.token_expiry = None
+            elif e.status_code == 409:
+                _LOGGER.warning(f"WebSocket rejected (HTTP 409) - connection already exists. Forcing new negotiation...")
+                # Another connection is using this connection_id, need to negotiate a new one
+                self.connection_id = None
             else:
                 _LOGGER.error(f"WebSocket rejected: HTTP {e.status_code}")
             return False
