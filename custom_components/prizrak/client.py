@@ -12,6 +12,13 @@ import base64
 
 _LOGGER = logging.getLogger(__name__)
 
+try:
+    # websockets > 10.0
+    from websockets.exceptions import InvalidStatusCode
+except ImportError:
+    # websockets < 10.0
+    from websockets.exceptions import InvalidStatus as InvalidStatusCode
+
 
 class PrizrakClient:
     """Client for Prizrak monitoring system."""
@@ -281,7 +288,7 @@ class PrizrakClient:
             _LOGGER.info("WebSocket connected!")
             self.reconnect_attempts = 0
             return True
-        except websockets.exceptions.InvalidStatusCode as e:
+        except InvalidStatusCode as e:
             if e.status_code == 404:
                 _LOGGER.warning(f"WebSocket rejected (HTTP 404) - connection_id expired. Forcing re-negotiation...")
                 # Force complete re-negotiation and re-auth
@@ -600,13 +607,6 @@ class PrizrakClient:
                     await self.send_handshake()
                     await asyncio.sleep(0.5)
                     await self.get_devices()
-                else:
-                    # Connection failed, wait before retry with exponential backoff
-                    delay = min(self.reconnect_delay * (2 ** min(self.reconnect_attempts, 5)), 60)
-                    _LOGGER.warning(f"WebSocket connection failed, retrying in {delay}s (attempt {self.reconnect_attempts + 1})...")
-                    self.reconnect_attempts += 1
-                    await asyncio.sleep(delay)
-                    continue
 
                     # Start background tasks
                     ping_task = asyncio.create_task(self.send_proactive_pings())
@@ -626,6 +626,13 @@ class PrizrakClient:
                             await health_task
                         except asyncio.CancelledError:
                             pass
+                else:
+                    # Connection failed, wait before retry with exponential backoff
+                    delay = min(self.reconnect_delay * (2 ** min(self.reconnect_attempts, 5)), 60)
+                    _LOGGER.warning(f"WebSocket connection failed, retrying in {delay}s (attempt {self.reconnect_attempts + 1})...")
+                    self.reconnect_attempts += 1
+                    await asyncio.sleep(delay)
+                    continue
 
             except websockets.exceptions.ConnectionClosed:
                 _LOGGER.warning(f"Connection closed, reconnecting in {self.reconnect_delay}s...")
