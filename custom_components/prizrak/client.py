@@ -294,11 +294,9 @@ class PrizrakClient:
                 # Force complete re-negotiation and re-auth
                 self.connection_id = None
                 self.auth_token = None
-                self.token_expiry = None
             elif e.status_code == 401:
                 _LOGGER.warning(f"WebSocket rejected (HTTP 401) - authentication failed. Forcing re-login...")
                 self.auth_token = None
-                self.token_expiry = None
             elif e.status_code == 409:
                 _LOGGER.warning(f"WebSocket rejected (HTTP 409) - connection already exists. Attempting to delete old connection...")
                 # Try to delete the existing connection
