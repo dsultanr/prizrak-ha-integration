@@ -45,6 +45,15 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
             # Add timestamp of last update (as datetime object for TIMESTAMP device_class)
             full_device_state["last_update"] = dt_util.utcnow()
 
+            # Convert timestamp strings to datetime objects
+            time_key = "last_device_exchange_time"
+            if time_key in full_device_state and isinstance(full_device_state[time_key], str):
+                try:
+                    full_device_state[time_key] = dt_util.parse_datetime(full_device_state[time_key])
+                except (ValueError, TypeError):
+                    _LOGGER.warning(f"Could not parse {time_key}: {full_device_state[time_key]}")
+                    full_device_state[time_key] = None
+
             # Update coordinator's cache
             self.devices[device_id] = full_device_state
 
