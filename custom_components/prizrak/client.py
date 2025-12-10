@@ -226,6 +226,28 @@ class PrizrakClient:
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self._negotiate_connection_sync)
 
+    async def delete_connection(self, connection_id: str):
+        """Delete an existing connection on the server."""
+        try:
+            delete_url = f"{self.base_url}/api/Control?id={connection_id}"
+            _LOGGER.info(f"Attempting to delete existing connection...")
+
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None,
+                lambda: requests.delete(delete_url, headers=self._get_headers(), timeout=5)
+            )
+
+            if response.status_code in [200, 204, 404]:
+                _LOGGER.info(f"Existing connection deleted or already gone (HTTP {response.status_code})")
+                return True
+            else:
+                _LOGGER.warning(f"Delete connection returned HTTP {response.status_code}")
+                return False
+        except Exception as e:
+            _LOGGER.warning(f"Failed to delete connection: {e}")
+            return False
+
     def _cleanup_pending_invocations(self):
         """Cancel all pending invocations (called on disconnect/reconnect)."""
         if self.pending_invocations:
@@ -271,9 +293,17 @@ class PrizrakClient:
                 self.auth_token = None
                 self.token_expiry = None
             elif e.status_code == 409:
-                _LOGGER.warning(f"WebSocket rejected (HTTP 409) - connection already exists. Forcing new negotiation...")
-                # Another connection is using this connection_id, need to negotiate a new one
-                self.connection_id = None
+                _LOGGER.warning(f"WebSocket rejected (HTTP 409) - connection already exists. Attempting to delete old connection...")
+                # Try to delete the existing connection
+                old_conn_id = self.connection_id
+                if await self.delete_connection(old_conn_id):
+                    # Successfully deleted, try to negotiate a new connection
+                    self.connection_id = None
+                    await asyncio.sleep(1)  # Give server time to clean up
+                else:
+                    # Delete failed, force new negotiation anyway
+                    self.connection_id = None
+                    await asyncio.sleep(2)  # Wait longer if delete failed
             else:
                 _LOGGER.error(f"WebSocket rejected: HTTP {e.status_code}")
             return False
