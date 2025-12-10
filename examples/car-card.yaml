@@ -248,10 +248,10 @@ cards:
             entity: sensor.prizrak_95311_temperature
             suffix: "°C"
             style:
-              top: 50%
+              top: 40%
               left: 50%
               color: white
-              font-size: 18px
+              font-size: 12px
               font-weight: bold
               text-shadow: 2px 2px 4px rgba(0,0,0,0.8)
 
