@@ -146,6 +146,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             except Exception as e:
                 _LOGGER.error(f"Error closing WebSocket: {e}")
 
+        # Reset connection_id to force new negotiation
+        coordinator.client.connection_id = None
+        _LOGGER.info("Connection ID reset for clean reconnection")
+
     hass.services.async_register(DOMAIN, "reconnect", handle_reconnect)
 
     return True
