@@ -12,13 +12,6 @@ import base64
 
 _LOGGER = logging.getLogger(__name__)
 
-try:
-    # websockets > 10.0
-    from websockets.exceptions import InvalidStatusCode
-except ImportError:
-    # websockets < 10.0
-    from websockets.exceptions import InvalidStatus as InvalidStatusCode
-
 
 class PrizrakClient:
     """Client for Prizrak monitoring system."""
@@ -288,32 +281,32 @@ class PrizrakClient:
             _LOGGER.info("WebSocket connected!")
             self.reconnect_attempts = 0
             return True
-        except InvalidStatusCode as e:
-            if e.status_code == 404:
-                _LOGGER.warning(f"WebSocket rejected (HTTP 404) - connection_id expired. Forcing re-negotiation...")
-                # Force complete re-negotiation and re-auth
-                self.connection_id = None
-                self.auth_token = None
-            elif e.status_code == 401:
-                _LOGGER.warning(f"WebSocket rejected (HTTP 401) - authentication failed. Forcing re-login...")
-                self.auth_token = None
-            elif e.status_code == 409:
-                _LOGGER.warning(f"WebSocket rejected (HTTP 409) - connection already exists. Attempting to delete old connection...")
-                # Try to delete the existing connection
-                old_conn_id = self.connection_id
-                if await self.delete_connection(old_conn_id):
-                    # Successfully deleted, try to negotiate a new connection
-                    self.connection_id = None
-                    await asyncio.sleep(1)  # Give server time to clean up
-                else:
-                    # Delete failed, force new negotiation anyway
-                    self.connection_id = None
-                    await asyncio.sleep(2)  # Wait longer if delete failed
-            else:
-                _LOGGER.error(f"WebSocket rejected: HTTP {e.status_code}")
-            return False
         except Exception as e:
-            _LOGGER.error(f"WebSocket error: {type(e).__name__}: {e}")
+            # Duck-typing: Check if the exception has a status_code attribute
+            if hasattr(e, "status_code"):
+                status_code = e.status_code
+                if status_code == 404:
+                    _LOGGER.warning(f"WebSocket rejected (HTTP 404) - forcing re-auth...")
+                    self.connection_id = None
+                    self.auth_token = None
+                elif status_code == 401:
+                    _LOGGER.warning(f"WebSocket rejected (HTTP 401) - forcing re-auth...")
+                    self.auth_token = None
+                elif status_code == 409:
+                    _LOGGER.warning(f"WebSocket rejected (HTTP 409) - connection exists...")
+                    # Try to delete the existing connection
+                    old_conn_id = self.connection_id
+                    # Run delete in a new task to avoid blocking the reconnect loop
+                    asyncio.create_task(self.delete_connection(old_conn_id))
+                    # Force new negotiation immediately
+                    self.connection_id = None
+                    await asyncio.sleep(2)  # Give server time to process delete
+                else:
+                    _LOGGER.error(f"WebSocket rejected with unhandled code: HTTP {status_code}")
+            else:
+                # Not an HTTP status error, log as a generic WebSocket error
+                _LOGGER.error(f"WebSocket error: {type(e).__name__}: {e}")
+
             return False
 
     async def send_handshake(self):
