@@ -259,8 +259,22 @@ class PrizrakClient:
             _LOGGER.info("WebSocket connected!")
             self.reconnect_attempts = 0
             return True
+        except websockets.exceptions.InvalidStatusCode as e:
+            if e.status_code == 404:
+                _LOGGER.warning(f"WebSocket rejected (HTTP 404) - connection_id expired. Forcing re-negotiation...")
+                # Force complete re-negotiation and re-auth
+                self.connection_id = None
+                self.auth_token = None
+                self.token_expiry = None
+            elif e.status_code == 401:
+                _LOGGER.warning(f"WebSocket rejected (HTTP 401) - authentication failed. Forcing re-login...")
+                self.auth_token = None
+                self.token_expiry = None
+            else:
+                _LOGGER.error(f"WebSocket rejected: HTTP {e.status_code}")
+            return False
         except Exception as e:
-            _LOGGER.error(f"WebSocket error: {e}")
+            _LOGGER.error(f"WebSocket error: {type(e).__name__}: {e}")
             return False
 
     async def send_handshake(self):
@@ -552,6 +566,13 @@ class PrizrakClient:
                     await self.send_handshake()
                     await asyncio.sleep(0.5)
                     await self.get_devices()
+                else:
+                    # Connection failed, wait before retry with exponential backoff
+                    delay = min(self.reconnect_delay * (2 ** min(self.reconnect_attempts, 5)), 60)
+                    _LOGGER.warning(f"WebSocket connection failed, retrying in {delay}s (attempt {self.reconnect_attempts + 1})...")
+                    self.reconnect_attempts += 1
+                    await asyncio.sleep(delay)
+                    continue
 
                     # Start background tasks
                     ping_task = asyncio.create_task(self.send_proactive_pings())

@@ -12,6 +12,7 @@ PLATFORMS = ["sensor", "binary_sensor", "button"]
 SENSOR_TYPES = {
     "serial_no": ("Serial Number", None, None, "mdi:identifier", "serial_no"),
     "last_update": ("Last Update", None, SensorDeviceClass.TIMESTAMP, "mdi:clock-outline", "last_update"),
+    "last_device_exchange_time": ("Last Device Exchange", None, SensorDeviceClass.TIMESTAMP, "mdi:swap-horizontal", "last_device_exchange_time"),
 
     # GPS
     "latitude": ("Latitude", "°", None, "mdi:map-marker", "geo.lat"),
