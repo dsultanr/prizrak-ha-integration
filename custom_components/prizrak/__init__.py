@@ -132,6 +132,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Setup platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    # Register reconnect service
+    async def handle_reconnect(call):
+        """Handle reconnect service call."""
+        _LOGGER.info("Reconnect service called - forcing reconnection...")
+        coordinator: PrizrakDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+
+        # Close current WebSocket connection to trigger reconnect
+        if coordinator.client.websocket:
+            try:
+                await coordinator.client.websocket.close()
+                _LOGGER.info("WebSocket closed, will reconnect automatically")
+            except Exception as e:
+                _LOGGER.error(f"Error closing WebSocket: {e}")
+
+    hass.services.async_register(DOMAIN, "reconnect", handle_reconnect)
+
     return True
 
 
@@ -156,5 +172,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
         hass.data[DOMAIN].pop(f"{entry.entry_id}_task", None)
+
+        # Unregister service
+        hass.services.async_remove(DOMAIN, "reconnect")
 
     return unload_ok

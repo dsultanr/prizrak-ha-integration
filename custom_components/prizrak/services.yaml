@@ -1,0 +1,4 @@
+reconnect:
+  name: Reconnect
+  description: Force reconnection to Prizrak server
+  fields: {}

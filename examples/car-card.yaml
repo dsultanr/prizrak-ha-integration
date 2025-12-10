@@ -45,6 +45,11 @@ cards:
         entity: sensor.prizrak_95311_last_update
         name: Соединение
         icon: mdi:connection
+        tap_action:
+          action: call-service
+          service: prizrak.reconnect
+          confirmation:
+            text: "Переподключиться к серверу Prizrak?"
         card_mod:
           style: |
             ha-card {
