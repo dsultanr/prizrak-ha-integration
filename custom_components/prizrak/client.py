@@ -282,18 +282,26 @@ class PrizrakClient:
             self.reconnect_attempts = 0
             return True
         except Exception as e:
-            # Duck-typing: Check if the exception has a status_code attribute
+            # Check for status code in both old and new websockets exception formats
+            status_code = None
             if hasattr(e, "status_code"):
+                # Old format: InvalidStatusCode with direct status_code attribute
                 status_code = e.status_code
+            elif hasattr(e, "response") and hasattr(e.response, "status_code"):
+                # New format: InvalidStatus with response.status_code attribute
+                status_code = e.response.status_code
+
+            if status_code:
+                _LOGGER.error(f"WebSocket rejected: HTTP {status_code}")
                 if status_code == 404:
-                    _LOGGER.warning(f"WebSocket rejected (HTTP 404) - forcing re-auth...")
+                    _LOGGER.warning(f"HTTP 404 - connection_id invalid, forcing re-negotiation...")
                     self.connection_id = None
                     self.auth_token = None
                 elif status_code == 401:
-                    _LOGGER.warning(f"WebSocket rejected (HTTP 401) - forcing re-auth...")
+                    _LOGGER.warning(f"HTTP 401 - auth failed, forcing re-authentication...")
                     self.auth_token = None
                 elif status_code == 409:
-                    _LOGGER.warning(f"WebSocket rejected (HTTP 409) - connection exists...")
+                    _LOGGER.warning(f"HTTP 409 - connection exists, deleting old connection...")
                     # Try to delete the existing connection
                     old_conn_id = self.connection_id
                     # Run delete in a new task to avoid blocking the reconnect loop
@@ -301,11 +309,17 @@ class PrizrakClient:
                     # Force new negotiation immediately
                     self.connection_id = None
                     await asyncio.sleep(2)  # Give server time to process delete
+                elif status_code >= 500:
+                    _LOGGER.warning(f"HTTP {status_code} - server error, will retry...")
+                    self.connection_id = None
                 else:
-                    _LOGGER.error(f"WebSocket rejected with unhandled code: HTTP {status_code}")
+                    _LOGGER.error(f"Unhandled HTTP code: {status_code}")
+                    self.connection_id = None
             else:
                 # Not an HTTP status error, log as a generic WebSocket error
                 _LOGGER.error(f"WebSocket error: {type(e).__name__}: {e}")
+                # Reset connection_id for any connection error to force fresh negotiation
+                self.connection_id = None
 
             return False
 
