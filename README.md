@@ -4,8 +4,7 @@
 
 Интеграция Home Assistant для системы мониторинга автомобилей Prizrak (monitoring.tecel.ru).
 
-<img width="773" height="620" alt="image" src="https://github.com/user-attachments/assets/1ccb811c-80e5-4e13-a0e5-24137d0eb2cb" />
-
+<img width="670" height="730" alt="image" src="https://github.com/user-attachments/assets/5c61560b-5473-4879-8d77-449573ce1885" />
 
 ## Возможности
 
