@@ -17,7 +17,7 @@ from .coordinator import PrizrakDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON, Platform.DEVICE_TRACKER]
 
 
 async def _setup_www_files(hass: HomeAssistant) -> None:

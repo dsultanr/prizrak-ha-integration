@@ -6,7 +6,7 @@ DOMAIN = "prizrak"
 CONF_EMAIL = "email"
 CONF_PASSWORD = "password"
 
-PLATFORMS = ["sensor", "binary_sensor", "button"]
+PLATFORMS = ["sensor", "binary_sensor", "button", "device_tracker"]
 
 # Sensor definitions: (name, unit, device_class, icon, state_key)
 SENSOR_TYPES = {
