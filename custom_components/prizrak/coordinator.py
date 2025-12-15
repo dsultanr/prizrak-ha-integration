@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from datetime import datetime
 from typing import Any
 
@@ -29,6 +30,11 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
         self.client = client
         self.devices: dict[int, dict[str, Any]] = {}
 
+        # Throttling for frontend updates to prevent browser memory issues
+        # Data is always up-to-date on HA server, but browser UI updates are throttled
+        self.last_frontend_update: float = 0.0
+        self.frontend_update_interval: float = 30.0  # seconds
+
     @callback
     def handle_device_update(self, device_id: int, device_state: dict[str, Any]) -> None:
         """Handle device state update from WebSocket.
@@ -54,11 +60,27 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
                     _LOGGER.warning(f"Could not parse {time_key}: {full_device_state[time_key]}")
                     full_device_state[time_key] = None
 
-            # Update coordinator's cache
+            # ALWAYS update coordinator's cache (server-side data)
+            # This ensures automations, scripts, and history have real-time data
             self.devices[device_id] = full_device_state
 
-            # Notify all listeners (entities) about the update
-            self.async_set_updated_data(self.devices)
+            # Throttle frontend updates to prevent browser memory issues
+            # Only notify frontend (browser UI) if enough time has passed
+            current_time = time.time()
+            time_since_last_update = current_time - self.last_frontend_update
+
+            if time_since_last_update >= self.frontend_update_interval:
+                # Notify all listeners (entities) about the update → triggers browser UI redraw
+                self.async_set_updated_data(self.devices)
+                self.last_frontend_update = current_time
+                _LOGGER.debug(
+                    f"Frontend update sent (throttled: {time_since_last_update:.1f}s since last)"
+                )
+            else:
+                # Data updated on server, but browser UI not notified yet (throttled)
+                _LOGGER.debug(
+                    f"Frontend update skipped (throttled: {time_since_last_update:.1f}s < {self.frontend_update_interval}s)"
+                )
         else:
             _LOGGER.warning(f"Device {device_id} not found in client.device_states")
 
