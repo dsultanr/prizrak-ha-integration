@@ -1,6 +1,7 @@
 """DataUpdateCoordinator for Prizrak integration."""
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 from datetime import datetime
@@ -34,6 +35,8 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
         # Data is always up-to-date on HA server, but browser UI updates are throttled
         self.last_frontend_update: float = 0.0
         self.frontend_update_interval: float = 30.0  # seconds
+        self.throttling_enabled: bool = True
+        self.throttling_disable_task: Any | None = None
 
     @callback
     def handle_device_update(self, device_id: int, device_state: dict[str, Any]) -> None:
@@ -69,13 +72,15 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
             current_time = time.time()
             time_since_last_update = current_time - self.last_frontend_update
 
-            if time_since_last_update >= self.frontend_update_interval:
+            # Check if throttling is enabled and enough time has passed
+            should_update = not self.throttling_enabled or time_since_last_update >= self.frontend_update_interval
+
+            if should_update:
                 # Notify all listeners (entities) about the update → triggers browser UI redraw
                 self.async_set_updated_data(self.devices)
                 self.last_frontend_update = current_time
-                _LOGGER.debug(
-                    f"Frontend update sent (throttled: {time_since_last_update:.1f}s since last)"
-                )
+                throttle_status = "disabled" if not self.throttling_enabled else f"throttled: {time_since_last_update:.1f}s since last"
+                _LOGGER.debug(f"Frontend update sent ({throttle_status})")
             else:
                 # Data updated on server, but browser UI not notified yet (throttled)
                 _LOGGER.debug(
@@ -83,6 +88,31 @@ class PrizrakDataUpdateCoordinator(DataUpdateCoordinator):
                 )
         else:
             _LOGGER.warning(f"Device {device_id} not found in client.device_states")
+
+    def disable_throttling_temporarily(self, duration: float = 30.0) -> None:
+        """Temporarily disable frontend update throttling.
+
+        Used after sending commands (Guard, Autolaunch) to show immediate feedback.
+        Throttling is re-enabled after specified duration.
+
+        Args:
+            duration: How long to disable throttling (seconds)
+        """
+        # Cancel previous task if exists
+        if self.throttling_disable_task and not self.throttling_disable_task.done():
+            self.throttling_disable_task.cancel()
+
+        # Disable throttling
+        self.throttling_enabled = False
+        _LOGGER.info(f"Throttling disabled for {duration}s (command sent)")
+
+        # Schedule re-enable
+        async def re_enable_throttling():
+            await asyncio.sleep(duration)
+            self.throttling_enabled = True
+            _LOGGER.info("Throttling re-enabled")
+
+        self.throttling_disable_task = self.hass.async_create_task(re_enable_throttling())
 
     async def _async_update_data(self) -> dict[int, dict[str, Any]]:
         """Update data via library.

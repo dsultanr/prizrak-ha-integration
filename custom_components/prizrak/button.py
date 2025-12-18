@@ -97,6 +97,9 @@ class PrizrakButton(CoordinatorEntity, ButtonEntity):
                 f"Please check your internet connection and try again."
             )
 
+        # Disable throttling temporarily to show immediate feedback in browser
+        self.coordinator.disable_throttling_temporarily(duration=30.0)
+
         # Send command via client with timeout
         try:
             success = await self.coordinator.client.send_command(
