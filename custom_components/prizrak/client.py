@@ -9,6 +9,7 @@ from typing import Optional, Dict, Any, Callable
 import time
 import hashlib
 import base64
+import re
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,13 +63,55 @@ class PrizrakClient:
         # Track pending command invocations
         self.pending_invocations: Dict[str, asyncio.Future] = {}
 
+        # App version (fetched once at startup)
+        self.app_version: Optional[str] = None
+
+    def _fetch_app_version_sync(self) -> str:
+        """Fetch current app version from passport.js (synchronous)."""
+        try:
+            # Get main page to find passport.js URL
+            _LOGGER.info("Fetching app version from monitoring.tecel.ru...")
+            response = requests.get(f"{self.base_url}/", timeout=10)
+            if response.status_code != 200:
+                raise Exception(f"Failed to fetch main page: {response.status_code}")
+
+            # Find passport.js URL
+            passport_match = re.search(r'src="(passport/passport\.js\?v=[^"]+)"', response.text)
+            if not passport_match:
+                raise Exception("passport.js URL not found in main page")
+
+            passport_url = f"{self.base_url}/{passport_match.group(1)}"
+            _LOGGER.debug(f"Found passport.js URL: {passport_url}")
+
+            # Fetch passport.js
+            response = requests.get(passport_url, timeout=10)
+            if response.status_code != 200:
+                raise Exception(f"Failed to fetch passport.js: {response.status_code}")
+
+            # Extract version from window.tec.passport.version
+            version_match = re.search(r'version:\s*"(\d+\.\d+\.\d+\.\d+)"', response.text)
+            if not version_match:
+                raise Exception("Version not found in passport.js")
+
+            version = version_match.group(1)
+            _LOGGER.info(f"Detected app version: {version}")
+            return version
+
+        except Exception as e:
+            _LOGGER.warning(f"Failed to fetch app version: {e}, using fallback 271.0.0.0")
+            return "271.0.0.0"
+
     def _get_fingerprint_token(self) -> str:
         """Generate fingerprint token for vtoken."""
+        # Fetch version on first use
+        if not self.app_version:
+            self.app_version = self._fetch_app_version_sync()
+
         data = {
             "VTokenKey": "x-vtoken",
             "FingerPrint": hashlib.md5("browser_fingerprint".encode()).hexdigest(),
             "UniqId": "mit9hov5mit9hov6mit9hov7mit9hov8",
-            "AppVersion": "268.0.0.0",
+            "AppVersion": self.app_version,
             "Service": ""
         }
         return base64.b64encode(json.dumps(data).encode()).decode()
