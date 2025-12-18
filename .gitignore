@@ -1,1 +1,3 @@
 SUMMARY.md
+*.log
+.env
