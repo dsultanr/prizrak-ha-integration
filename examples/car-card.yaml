@@ -244,7 +244,7 @@ cards:
                 style:
                   top: 10%
                   left: 50%
-                  color: "#ffffff"
+                  color: var(--state-binary_sensor-running-on-color, var(--state-binary_sensor-on-color, var(--state-active-color)))
                   --mdc-icon-size: 30px
                   opacity: 1
 
@@ -351,7 +351,7 @@ cards:
             - background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%)
           icon:
             - color: >
-                [[[ return entity.state === 'on' ? '#ffffff' : '#95a5a6'; ]]]
+                [[[ return entity.state === 'on' ? 'var(--state-binary_sensor-running-on-color, var(--state-binary_sensor-on-color, var(--state-active-color)))' : '#95a5a6'; ]]]
           name:
             - font-size: 12px
             - color: white
