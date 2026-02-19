@@ -200,6 +200,10 @@ class PrizrakClient:
                     return False
             else:
                 _LOGGER.error(f"No result in response: {auth_result}")
+                error = auth_result.get('error', {})
+                if error.get('message') == 'versionError':
+                    _LOGGER.warning("Version error detected, will re-fetch app version on next attempt")
+                    self.app_version = None
                 return False
 
         except Exception as e:
