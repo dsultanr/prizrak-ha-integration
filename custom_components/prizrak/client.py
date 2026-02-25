@@ -68,6 +68,8 @@ class PrizrakClient:
 
         # App version (fetched once at startup)
         self.app_version: Optional[str] = None
+        # Frontend web version (from passport.js?v=X.X.XXX)
+        self.frontend_version: Optional[str] = None
 
     def _fetch_app_version_sync(self) -> str:
         """Fetch current app version from passport.js (synchronous)."""
@@ -86,12 +88,18 @@ class PrizrakClient:
             passport_url = f"{self.base_url}/{passport_match.group(1)}"
             _LOGGER.debug(f"Found passport.js URL: {passport_url}")
 
+            # Extract frontend version from URL parameter (?v=1.0.174)
+            frontend_ver_match = re.search(r'\?v=(\S+)$', passport_match.group(1))
+            if frontend_ver_match:
+                self.frontend_version = frontend_ver_match.group(1)
+                _LOGGER.info(f"Detected frontend version: {self.frontend_version}")
+
             # Fetch passport.js
             response = requests.get(passport_url, timeout=10)
             if response.status_code != 200:
                 raise Exception(f"Failed to fetch passport.js: {response.status_code}")
 
-            # Extract version from window.tec.passport.version
+            # Extract app version from window.tec.passport.version
             version_match = re.search(r'version:\s*"(\d+\.\d+\.\d+\.\d+)"', response.text)
             if not version_match:
                 raise Exception("Version not found in passport.js")
@@ -231,15 +239,16 @@ class PrizrakClient:
         return True
 
     def _create_auth_payload(self) -> Dict[str, Any]:
+        frontend_ver = self.frontend_version or "1.0.174"
         return {
             "Type": 2154785295,
             "Atoken": self.auth_token,
             "ClientData": {
-                "AppName": "Home Assistant Prizrak",
-                "AppVersion": "1.0.0",
+                "AppName": "Monitoring Web",
+                "AppVersion": frontend_ver,
                 "AppHost": "monitoring.tecel.ru",
-                "IsUserDataAvailable": True,
-                "AdditionalInfo": {}
+                "UniqueId": hashlib.md5("browser_fingerprint".encode()).hexdigest(),
+                "OsVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
             },
             "Lang": "ru"
         }
@@ -715,6 +724,7 @@ class PrizrakClient:
                         self.connection_id = None
                         await asyncio.sleep(self.reconnect_delay)
                         continue
+                    await self.send_ping()
                     await self.get_devices()
 
                     # Start background tasks
