@@ -378,6 +378,39 @@ class PrizrakClient:
         await self.websocket.send(json.dumps(handshake) + '\x1e')
         _LOGGER.info("Handshake sent")
 
+    async def receive_handshake_response(self) -> bool:
+        """Read and verify SignalR handshake response from server."""
+        try:
+            response = await asyncio.wait_for(self.websocket.recv(), timeout=10.0)
+            if isinstance(response, bytes):
+                response = response.decode('utf-8')
+
+            # Response may contain multiple \x1e-separated messages
+            for part in response.split('\x1e'):
+                part = part.strip()
+                if not part:
+                    continue
+                try:
+                    data = json.loads(part)
+                    if data.get('error'):
+                        _LOGGER.error(f"SignalR handshake rejected by server: {data['error']}")
+                        return False
+                except json.JSONDecodeError:
+                    pass
+
+            _LOGGER.info("Handshake response OK")
+            return True
+
+        except asyncio.TimeoutError:
+            _LOGGER.error("Timeout waiting for handshake response from server")
+            return False
+        except websockets.exceptions.ConnectionClosed as e:
+            _LOGGER.error(f"Connection closed before handshake response: {e}")
+            return False
+        except Exception as e:
+            _LOGGER.error(f"Error reading handshake response: {e}")
+            return False
+
     async def send_ping(self):
         ping_msg = {"type": 6}
         await self.websocket.send(json.dumps(ping_msg) + '\x1e')
@@ -666,7 +699,10 @@ class PrizrakClient:
                 # Connect to WebSocket
                 if await self.connect_websocket():
                     await self.send_handshake()
-                    await asyncio.sleep(0.5)
+                    if not await self.receive_handshake_response():
+                        self.connection_id = None
+                        await asyncio.sleep(self.reconnect_delay)
+                        continue
                     await self.get_devices()
 
                     # Start background tasks
@@ -695,8 +731,8 @@ class PrizrakClient:
                     await asyncio.sleep(delay)
                     continue
 
-            except websockets.exceptions.ConnectionClosed:
-                _LOGGER.warning(f"Connection closed, reconnecting in {self.reconnect_delay}s...")
+            except websockets.exceptions.ConnectionClosed as e:
+                _LOGGER.warning(f"Connection closed (code={e.code}, reason={e.reason!r}), reconnecting in {self.reconnect_delay}s...")
                 self.reconnect_attempts += 1
                 await asyncio.sleep(self.reconnect_delay)
                 self.connection_id = None
