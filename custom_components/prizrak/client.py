@@ -261,6 +261,7 @@ class PrizrakClient:
             response = requests.post(negotiate_url, headers=self._get_headers(), timeout=10)
             if response.status_code == 200:
                 data = response.json()
+                _LOGGER.debug(f"Negotiate response: {data}")
                 connection_token = data.get('connectionToken')
                 _LOGGER.info(f"Connection negotiated successfully")
                 return connection_token
@@ -543,8 +544,11 @@ class PrizrakClient:
         """Receive and process WebSocket messages."""
         try:
             self.last_message_time = time.time()
+            message_count = 0
+            _LOGGER.debug("receive_messages: starting loop")
 
             async for message in self.websocket:
+                message_count += 1
                 try:
                     self.last_message_time = time.time()
 
@@ -623,8 +627,16 @@ class PrizrakClient:
                 except Exception as e:
                     _LOGGER.error(f"Error processing message: {e}")
 
-        except websockets.exceptions.ConnectionClosed:
-            _LOGGER.warning("Connection closed")
+            # async for exhausted = server closed connection cleanly
+            close = self.websocket.close_code
+            reason = self.websocket.close_reason
+            _LOGGER.warning(
+                f"receive_messages: loop ended after {message_count} messages "
+                f"(server closed cleanly, code={close}, reason={reason!r})"
+            )
+
+        except websockets.exceptions.ConnectionClosed as e:
+            _LOGGER.warning(f"Connection closed unexpectedly (code={e.code}, reason={e.reason!r})")
             raise
         except asyncio.TimeoutError:
             _LOGGER.warning("Connection timeout - no messages received")
@@ -711,6 +723,11 @@ class PrizrakClient:
 
                     try:
                         await self.receive_messages()
+                        # receive_messages() returned normally = server closed cleanly
+                        # Reset and reconnect after a delay
+                        self.reconnect_attempts += 1
+                        self.connection_id = None
+                        await asyncio.sleep(self.reconnect_delay)
                     finally:
                         # Cancel background tasks when receive_messages exits
                         ping_task.cancel()
