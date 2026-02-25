@@ -63,6 +63,9 @@ class PrizrakClient:
         # Track pending command invocations
         self.pending_invocations: Dict[str, asyncio.Future] = {}
 
+        # Track GetDevices invocation id to detect its response
+        self.get_devices_invocation_id: Optional[str] = None
+
         # App version (fetched once at startup)
         self.app_version: Optional[str] = None
 
@@ -382,14 +385,15 @@ class PrizrakClient:
 
     async def get_devices(self):
         self.invocation_counter += 1
+        self.get_devices_invocation_id = str(self.invocation_counter)
         request = {
             "type": 1,
-            "invocationId": str(self.invocation_counter),
+            "invocationId": self.get_devices_invocation_id,
             "target": "GetDevices",
             "arguments": [{"registrations": True, "custom_fields": True, "possible_commands": True}]
         }
         await self.websocket.send(json.dumps(request, ensure_ascii=False) + '\x1e')
-        _LOGGER.info(f"GetDevices request sent")
+        _LOGGER.info(f"GetDevices request sent (invocationId={self.get_devices_invocation_id})")
 
     async def watch_devices(self, device_ids):
         self.invocation_counter += 1
@@ -560,21 +564,26 @@ class PrizrakClient:
                                     })
 
                         # Handle GetDevices response
-                        if result and isinstance(result, dict):
-                            devices_data = result.get('data', {}).get('devices', [])
-                            if devices_data:
-                                self.devices = devices_data
-                                _LOGGER.info(f"Found {len(devices_data)} device(s):")
-                                for dev in devices_data:
-                                    _LOGGER.info(f"   • {dev.get('name')} ({dev.get('model')}) - ID: {dev.get('device_id')}")
-
-                                device_ids = [d['device_id'] for d in devices_data]
-                                await self.watch_devices(device_ids)
-
-                                # Signal that devices are ready
-                                if not self.devices_ready.is_set():
-                                    self.devices_ready.set()
-                                    _LOGGER.info("Devices ready event set")
+                        if invocation_id == self.get_devices_invocation_id:
+                            if error:
+                                _LOGGER.error(f"GetDevices error from server: {error}")
+                            elif result and isinstance(result, dict):
+                                devices_data = result.get('data', {}).get('devices', [])
+                                if devices_data:
+                                    self.devices = devices_data
+                                    _LOGGER.info(f"Found {len(devices_data)} device(s):")
+                                    for dev in devices_data:
+                                        _LOGGER.info(f"   • {dev.get('name')} ({dev.get('model')}) - ID: {dev.get('device_id')}")
+                                    device_ids = [d['device_id'] for d in devices_data]
+                                    await self.watch_devices(device_ids)
+                                else:
+                                    _LOGGER.warning(f"GetDevices returned empty device list. Raw result: {result}")
+                            else:
+                                _LOGGER.warning(f"GetDevices unexpected response: result={result}, error={error}")
+                            # Signal ready regardless — HA won't hang forever
+                            if not self.devices_ready.is_set():
+                                self.devices_ready.set()
+                                _LOGGER.info("Devices ready event set")
 
                 except json.JSONDecodeError:
                     _LOGGER.debug(f"Non-JSON message")
