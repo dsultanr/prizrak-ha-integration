@@ -124,7 +124,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Wait for devices to be ready (with timeout)
     try:
         _LOGGER.info("Waiting for devices to be ready...")
-        await asyncio.wait_for(client.devices_ready.wait(), timeout=30.0)
+        await asyncio.wait_for(client.devices_ready.wait(), timeout=90.0)
         _LOGGER.info("Devices are ready, setting up platforms")
     except asyncio.TimeoutError:
         _LOGGER.error("Timeout waiting for devices, setting up platforms anyway")
