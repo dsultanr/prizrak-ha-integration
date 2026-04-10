@@ -80,10 +80,10 @@ class PrizrakClient:
             if response.status_code != 200:
                 raise Exception(f"Failed to fetch main page: {response.status_code}")
 
-            # Find passport.js URL
-            passport_match = re.search(r'src="(passport/passport\.js\?v=[^"]+)"', response.text)
+            # Find passport.js or passport.mjs URL
+            passport_match = re.search(r'src="(passport/passport\.m?js\?v=[^"]+)"', response.text)
             if not passport_match:
-                raise Exception("passport.js URL not found in main page")
+                raise Exception("passport.js/mjs URL not found in main page")
 
             passport_url = f"{self.base_url}/{passport_match.group(1)}"
             _LOGGER.debug(f"Found passport.js URL: {passport_url}")
@@ -109,8 +109,8 @@ class PrizrakClient:
             return version
 
         except Exception as e:
-            _LOGGER.warning(f"Failed to fetch app version: {e}, using fallback 271.0.0.0")
-            return "271.0.0.0"
+            _LOGGER.warning(f"Failed to fetch app version: {e}, using fallback 293.0.0.0")
+            return "293.0.0.0"
 
     def _get_fingerprint_token(self) -> str:
         """Generate fingerprint token for vtoken."""
