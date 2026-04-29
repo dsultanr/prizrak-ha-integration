@@ -9,7 +9,6 @@ from typing import Optional, Dict, Any, Callable
 import time
 import hashlib
 import base64
-import re
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -72,45 +71,24 @@ class PrizrakClient:
         self.frontend_version: Optional[str] = None
 
     def _fetch_app_version_sync(self) -> str:
-        """Fetch current app version from passport.js (synchronous)."""
+        """Fetch current app version from /passport/version_data API (synchronous)."""
         try:
-            # Get main page to find passport.js URL
             _LOGGER.info("Fetching app version from monitoring.tecel.ru...")
-            response = requests.get(f"{self.base_url}/", timeout=10)
+            response = requests.get(f"{self.base_url}/passport/version_data", timeout=10)
             if response.status_code != 200:
-                raise Exception(f"Failed to fetch main page: {response.status_code}")
+                raise Exception(f"Failed to fetch version_data: {response.status_code}")
 
-            # Find passport.js or passport.mjs URL
-            passport_match = re.search(r'src="(passport/passport\.m?js\?v=[^"]+)"', response.text)
-            if not passport_match:
-                raise Exception("passport.js/mjs URL not found in main page")
+            data = response.json()
+            version = data.get("app_version")
+            if not version:
+                raise Exception("app_version not found in version_data response")
 
-            passport_url = f"{self.base_url}/{passport_match.group(1)}"
-            _LOGGER.debug(f"Found passport.js URL: {passport_url}")
-
-            # Extract frontend version from URL parameter (?v=1.0.174)
-            frontend_ver_match = re.search(r'\?v=(\S+)$', passport_match.group(1))
-            if frontend_ver_match:
-                self.frontend_version = frontend_ver_match.group(1)
-                _LOGGER.info(f"Detected frontend version: {self.frontend_version}")
-
-            # Fetch passport.js
-            response = requests.get(passport_url, timeout=10)
-            if response.status_code != 200:
-                raise Exception(f"Failed to fetch passport.js: {response.status_code}")
-
-            # Extract app version from window.tec.passport.version
-            version_match = re.search(r'version:\s*"(\d+\.\d+\.\d+\.\d+)"', response.text)
-            if not version_match:
-                raise Exception("Version not found in passport.js")
-
-            version = version_match.group(1)
             _LOGGER.info(f"Detected app version: {version}")
             return version
 
         except Exception as e:
-            _LOGGER.warning(f"Failed to fetch app version: {e}, using fallback 293.0.0.0")
-            return "293.0.0.0"
+            _LOGGER.warning(f"Failed to fetch app version: {e}, using fallback 296.0.0.0")
+            return "296.0.0.0"
 
     def _get_fingerprint_token(self) -> str:
         """Generate fingerprint token for vtoken."""
