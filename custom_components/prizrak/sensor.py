@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -32,7 +32,7 @@ async def async_setup_entry(
         device_name = device_info.get('name', f"Prizrak {device_id}") if device_info else f"Prizrak {device_id}"
         device_model = device_info.get('model', 'Unknown') if device_info else 'Unknown'
 
-        for sensor_key, (name, unit, device_class, icon, state_key) in SENSOR_TYPES.items():
+        for sensor_key, (name, unit, device_class, icon, state_key, state_class) in SENSOR_TYPES.items():
             entities.append(
                 PrizrakSensor(
                     coordinator,
@@ -44,7 +44,8 @@ async def async_setup_entry(
                     unit,
                     device_class,
                     icon,
-                    state_key
+                    state_key,
+                    state_class,
                 )
             )
 
@@ -89,6 +90,7 @@ class PrizrakSensor(CoordinatorEntity, SensorEntity):
         device_class: str | None,
         icon: str | None,
         state_key: str,
+        state_class: SensorStateClass | None,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
@@ -104,6 +106,7 @@ class PrizrakSensor(CoordinatorEntity, SensorEntity):
         self._attr_unit_of_measurement = unit
         self._attr_device_class = device_class
         self._attr_icon = icon
+        self._attr_state_class = state_class
 
         # Device info for grouping
         self._attr_device_info = {

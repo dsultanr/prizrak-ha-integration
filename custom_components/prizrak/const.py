@@ -1,6 +1,6 @@
 """Constants for the Prizrak Monitoring integration."""
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
-from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 
 DOMAIN = "prizrak"
 CONF_EMAIL = "email"
@@ -8,46 +8,46 @@ CONF_PASSWORD = "password"
 
 PLATFORMS = ["sensor", "binary_sensor", "button", "device_tracker"]
 
-# Sensor definitions: (name, unit, device_class, icon, state_key)
+# Sensor definitions: (name, unit, device_class, icon, state_key, state_class)
 SENSOR_TYPES = {
-    "serial_no": ("Serial Number", None, None, "mdi:identifier", "serial_no"),
-    "last_update": ("Last Update", None, SensorDeviceClass.TIMESTAMP, "mdi:clock-outline", "last_update"),
-    "last_device_exchange_time": ("Last Device Exchange", None, SensorDeviceClass.TIMESTAMP, "mdi:swap-horizontal", "last_device_exchange_time"),
+    "serial_no": ("Serial Number", None, None, "mdi:identifier", "serial_no", None),
+    "last_update": ("Last Update", None, SensorDeviceClass.TIMESTAMP, "mdi:clock-outline", "last_update", None),
+    "last_device_exchange_time": ("Last Device Exchange", None, SensorDeviceClass.TIMESTAMP, "mdi:swap-horizontal", "last_device_exchange_time", None),
 
     # GPS
-    "latitude": ("Latitude", "°", None, "mdi:map-marker", "geo.lat"),
-    "longitude": ("Longitude", "°", None, "mdi:map-marker", "geo.lon"),
-    "gnss_speed": ("GNSS Speed", "km/h", SensorDeviceClass.SPEED, "mdi:speedometer", "geo_ext.gnss_speed"),
-    "altitude": ("Altitude", "m", SensorDeviceClass.DISTANCE, "mdi:altimeter", "geo_ext.gnss_height"),
-    "satellites": ("Satellites", None, None, "mdi:satellite-variant", "geo_ext.gnss_sat_used"),
-    "azimuth": ("Azimuth", "°", None, "mdi:compass", "geo_ext.gnss_azimuth"),
+    "latitude": ("Latitude", "°", None, "mdi:map-marker", "geo.lat", SensorStateClass.MEASUREMENT),
+    "longitude": ("Longitude", "°", None, "mdi:map-marker", "geo.lon", SensorStateClass.MEASUREMENT),
+    "gnss_speed": ("GNSS Speed", "km/h", SensorDeviceClass.SPEED, "mdi:speedometer", "geo_ext.gnss_speed", SensorStateClass.MEASUREMENT),
+    "altitude": ("Altitude", "m", SensorDeviceClass.DISTANCE, "mdi:altimeter", "geo_ext.gnss_height", SensorStateClass.MEASUREMENT),
+    "satellites": ("Satellites", None, None, "mdi:satellite-variant", "geo_ext.gnss_sat_used", SensorStateClass.MEASUREMENT),
+    "azimuth": ("Azimuth", "°", None, "mdi:compass", "geo_ext.gnss_azimuth", SensorStateClass.MEASUREMENT),
 
     # Telemetry
-    "battery_voltage": ("Battery Voltage", "V", SensorDeviceClass.VOLTAGE, "mdi:car-battery", "accum_voltage"),
-    "fuel_level": ("Fuel Level", "L", None, "mdi:gas-station", "fuel_level"),
-    "temperature": ("Inside Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:thermometer", "inside_temp"),
-    "outside_temperature": ("Outside Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:thermometer", "outside_temp"),
-    "engine_temperature": ("Engine Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:engine", "engine_temp"),
-    "speed": ("Speed", "km/h", SensorDeviceClass.SPEED, "mdi:speedometer", "speed"),
-    "rpm": ("Engine RPM", "RPM", None, "mdi:engine", "rpm"),
-    "odometer": ("Odometer", "km", SensorDeviceClass.DISTANCE, "mdi:counter", "route"),
+    "battery_voltage": ("Battery Voltage", "V", SensorDeviceClass.VOLTAGE, "mdi:car-battery", "accum_voltage", SensorStateClass.MEASUREMENT),
+    "fuel_level": ("Fuel Level", "L", None, "mdi:gas-station", "fuel_level", SensorStateClass.MEASUREMENT),
+    "temperature": ("Inside Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:thermometer", "inside_temp", SensorStateClass.MEASUREMENT),
+    "outside_temperature": ("Outside Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:thermometer", "outside_temp", SensorStateClass.MEASUREMENT),
+    "engine_temperature": ("Engine Temperature", "°C", SensorDeviceClass.TEMPERATURE, "mdi:engine", "engine_temp", SensorStateClass.MEASUREMENT),
+    "speed": ("Speed", "km/h", SensorDeviceClass.SPEED, "mdi:speedometer", "speed", SensorStateClass.MEASUREMENT),
+    "rpm": ("Engine RPM", "RPM", None, "mdi:engine", "rpm", SensorStateClass.MEASUREMENT),
+    "odometer": ("Odometer", "km", SensorDeviceClass.DISTANCE, "mdi:counter", "route", SensorStateClass.TOTAL_INCREASING),
 
     # Engine & Systems (ignition and parking_brake moved to binary_sensor)
 
     # GSM
-    "gsm_level": ("GSM Signal", "%", None, "mdi:signal", "gsm_level"),
-    "sim_vendor": ("SIM Operator", None, None, "mdi:sim", "sim_1_vendor"),
-    "sim_balance": ("SIM Balance", None, None, "mdi:cash", "balance.value"),
+    "gsm_level": ("GSM Signal", "%", None, "mdi:signal", "gsm_level", SensorStateClass.MEASUREMENT),
+    "sim_vendor": ("SIM Operator", None, None, "mdi:sim", "sim_1_vendor", None),
+    "sim_balance": ("SIM Balance", None, None, "mdi:cash", "balance.value", None),
 
     # Heating
-    "driver_seat_heating": ("Driver Seat Heating", None, None, "mdi:car-seat-heater", "driver_seat_heating_state"),
-    "front_pass_seat_heating": ("Passenger Seat Heating", None, None, "mdi:car-seat-heater", "front_pass_seat_heating_state"),
-    "rear_left_seat_heating": ("Rear Left Seat Heating", None, None, "mdi:car-seat-heater", "rear_left_seat_heating_state"),
-    "rear_right_seat_heating": ("Rear Right Seat Heating", None, None, "mdi:car-seat-heater", "rear_right_seat_heating_state"),
-    "front_window_heating": ("Front Window Heating", None, None, "mdi:car-defrost-front", "front_window_heating_state"),
-    "rear_window_heating": ("Rear Window Heating", None, None, "mdi:car-defrost-rear", "rear_window_heating_state"),
-    "mirror_heating": ("Mirror Heating", None, None, "mdi:mirror", "mirror_heating_state"),
-    "wheel_heating": ("Wheel Heating", None, None, "mdi:steering", "wheel_heating_state"),
+    "driver_seat_heating": ("Driver Seat Heating", None, None, "mdi:car-seat-heater", "driver_seat_heating_state", None),
+    "front_pass_seat_heating": ("Passenger Seat Heating", None, None, "mdi:car-seat-heater", "front_pass_seat_heating_state", None),
+    "rear_left_seat_heating": ("Rear Left Seat Heating", None, None, "mdi:car-seat-heater", "rear_left_seat_heating_state", None),
+    "rear_right_seat_heating": ("Rear Right Seat Heating", None, None, "mdi:car-seat-heater", "rear_right_seat_heating_state", None),
+    "front_window_heating": ("Front Window Heating", None, None, "mdi:car-defrost-front", "front_window_heating_state", None),
+    "rear_window_heating": ("Rear Window Heating", None, None, "mdi:car-defrost-rear", "rear_window_heating_state", None),
+    "mirror_heating": ("Mirror Heating", None, None, "mdi:mirror", "mirror_heating_state", None),
+    "wheel_heating": ("Wheel Heating", None, None, "mdi:steering", "wheel_heating_state", None),
 }
 
 # Binary sensor definitions: (name, device_class, state_key)
